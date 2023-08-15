@@ -11,8 +11,7 @@ import moment from 'moment'
 import { message } from 'antd'
 import API from '@mybricks/sdk-for-app/api'
 import { Locker, Toolbar } from '@mybricks/sdk-for-app/ui'
-// import { config as ThemePlugin } from '@mybricks/plugin-theme'
-import { config as ThemePlugin } from '/Users/lianglihao/Documents/GitHub/plugin-theme/src/theme/index'
+import { config as ThemePlugin } from '@mybricks/plugin-theme'
 
 import css from './designer.less'
 
