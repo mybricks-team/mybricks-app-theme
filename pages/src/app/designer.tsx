@@ -16,7 +16,7 @@ import { config as ThemePlugin } from '@mybricks/plugin-theme'
 import css from './designer.less'
 
 const SPADesigner = (window as any).mybricks.SPADesigner
-const LOCAL_DATA_KEY = '"--mybricks--'
+// const LOCAL_DATA_KEY = '"--mybricks--'
 
 export default function Designer({ appData }) {
   const designerRef = useRef<{ dump: () => any, toJSON: () => any, getPlugin: (namespace: string) => any, geoView: { canvasDom } }>()
@@ -165,18 +165,6 @@ export default function Designer({ appData }) {
       </div>
     </div>
   )
-
-  return (
-    <div>
-      <button onClick={onSaveClick}>保存</button>
-      <div>
-        <SPADesigner
-          ref={designerRef}
-          config={spaDesignerConfig({appData})}
-        />
-      </div>
-    </div>
-  )
 }
 
 function spaDesignerConfig ({appData}) {
@@ -199,6 +187,13 @@ function spaDesignerConfig ({appData}) {
           return title
         },
       }
+    },
+    geoView: {
+      theme:{
+        css:[
+          'https://f2.beckwai.com/udata/pkg/eshop/fangzhou/pub/pkg/antd-4.21.6/antd.variable.min.css'
+        ],
+      },
     }
   }
 }
