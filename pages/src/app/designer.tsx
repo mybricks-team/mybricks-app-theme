@@ -10,6 +10,8 @@ import axios from 'axios'
 import moment from 'moment'
 import { message } from 'antd'
 import API from '@mybricks/sdk-for-app/api'
+import toolsPlugin from '@mybricks/plugin-tools'
+import versionPlugin from 'mybricks-plugin-version'
 import { Locker, Toolbar } from '@mybricks/sdk-for-app/ui'
 import { config as ThemePlugin } from '@mybricks/plugin-theme'
 
@@ -169,10 +171,18 @@ export default function Designer({ appData }) {
 
 function spaDesignerConfig ({appData}) {
   return {
-    plugins: [ThemePlugin],
+    plugins: [
+      ThemePlugin,
+      versionPlugin({
+        user: appData.user,
+        file: appData.fileContent || {}
+      }),
+      toolsPlugin(),
+    ],
     comLibLoader() {
       return new Promise((resolve) => {
-        resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.53/2023-08-14_20-14-30/edit.js'])
+        // TODO
+        resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.59-feat/styleUp.1/2023-08-17_20-51-45/edit.js'])
       })
     },
     pageContentLoader() {
