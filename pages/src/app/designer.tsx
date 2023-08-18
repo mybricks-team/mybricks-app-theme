@@ -37,7 +37,7 @@ export default function Designer({ appData }) {
 
     const { name, shareType, content, icon } = param
     API.File.save({
-      userId: appData.user.email,
+      userId: appData.user.id,
       fileId: appData.fileId,
       name,
       shareType,
@@ -95,7 +95,7 @@ export default function Designer({ appData }) {
     const themesConfig = toJSON.plugins['@mybricks/plugins/theme/config']
 
     const res = await axios.post('/api/theme/publish', {
-      userId: appData.user.email,
+      userId: appData.user.id,
       fileId: appData.fileId,
       json: themesConfig,
       title: appData.fileContent.name
