@@ -33,9 +33,21 @@ export default class Service {
   }
 }
 
+function getRealHostName(requestHeaders) {
+  let hostName = requestHeaders.host
+  if (requestHeaders['x-forwarded-host']) {
+    hostName = requestHeaders['x-forwarded-host']
+  } else if (requestHeaders['x-host']) {
+    hostName = requestHeaders['x-host'].replace(':443', '')
+  }
+  return hostName
+}
+
 /** 有问题找zouyongsheng */
 function getRealDomain(request) {
   let hostName = getRealHostName(request.headers);
+  const { origin } = request.headers
+  if (origin) return origin
   // let protocol = request.headers['x-scheme'] ? 'https' : 'http'
   /** TODO: 暂时写死 https */
   // let protocol = 'https';
@@ -70,14 +82,4 @@ function getNextVersion(version, max = 100) {
   }
 
   return vAry.join(".");
-}
-
-function getRealHostName(requestHeaders) {
-  let hostName = requestHeaders.host
-  if (requestHeaders['x-forwarded-host']) {
-    hostName = requestHeaders['x-forwarded-host']
-  } else if (requestHeaders['x-host']) {
-    hostName = requestHeaders['x-host'].replace(':443', '')
-  }
-  return hostName
 }
