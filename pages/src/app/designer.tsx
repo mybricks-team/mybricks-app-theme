@@ -181,8 +181,8 @@ function spaDesignerConfig ({appData}) {
     ],
     comLibLoader() {
       return new Promise((resolve) => {
-        // TODO
-        resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.59-feat/styleUp.1/2023-08-17_20-51-45/edit.js'])
+        // TODO: 先写死
+        resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.66/2023-08-21_21-15-51/edit.js'])
       })
     },
     pageContentLoader() {
@@ -190,6 +190,7 @@ function spaDesignerConfig ({appData}) {
         resolve(appData.fileContent.content)
       })
     },
+    // TODO: 临时开放，需要看类似选中、悬浮、禁用状态等
     toplView: {},
     com: {
       env: {
@@ -199,6 +200,16 @@ function spaDesignerConfig ({appData}) {
       }
     },
     geoView: {
+      layout: 'absolute',
+      scenes: {
+        adder: [
+          {
+            type: 'normal',
+            title: '普通场景',
+            layout: 'absolute'
+          }
+        ]
+      },
       theme:{
         css:[
           'https://f2.beckwai.com/udata/pkg/eshop/fangzhou/pub/pkg/antd-4.21.6/antd.variable.min.css'
