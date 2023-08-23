@@ -182,7 +182,7 @@ function spaDesignerConfig ({appData}) {
     comLibLoader() {
       return new Promise((resolve) => {
         // TODO: 先写死
-        resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.67/2023-08-22_20-42-39/edit.js'])
+        resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.67/2023-08-22_20-42-39/edit.js', 'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7182_1.0.53/2023-08-14_19-41-04/edit.js'])
       })
     },
     pageContentLoader() {
@@ -207,7 +207,25 @@ function spaDesignerConfig ({appData}) {
             type: 'normal',
             title: '普通场景',
             layout: 'absolute'
-          }
+          },
+          {
+            type: 'popup',
+            title: '对话框',
+            template: {
+              namespace: 'mybricks.basic-comlib.popup',
+              deletable: false,
+              asRoot: true
+            }
+          },
+          {
+            type: 'popup',
+            title: '抽屉',
+            template: {
+              namespace: 'mybricks.basic-comlib.drawer',
+              deletable: false,
+              asRoot: true
+            }
+          },
         ]
       },
       theme:{
