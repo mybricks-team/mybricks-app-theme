@@ -182,7 +182,7 @@ function spaDesignerConfig ({appData}) {
     comLibLoader() {
       return new Promise((resolve) => {
         // TODO: 先写死
-        resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.69/2023-08-24_15-03-28/edit.js', 'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7182_1.0.55/2023-08-23_22-05-28/edit.js'])
+        resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.71/2023-08-25_17-55-14/edit.js', 'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7182_1.0.55/2023-08-23_22-05-28/edit.js'])
       })
     },
     pageContentLoader() {
