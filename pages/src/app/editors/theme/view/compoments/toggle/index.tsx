@@ -10,7 +10,7 @@ import { useUpdateEffect } from '../../hooks'
 interface ToggleProps {
   defaultValue?: any
   onChange: (value: any) => void
-  options: Array<{label: ReactNode, value: any, tip?: string}>
+  options: Array<{label: ReactNode, value: any, tip?: string, disabled?: boolean}>
 }
 
 export function Toggle ({
@@ -31,13 +31,13 @@ export function Toggle ({
   return (
     <div className={css.toggle}>
       {options.map((option, index) => {
-        const { value, label, tip } = option
+        const { value, label, tip, disabled } = option
         return (
           <div
             data-mybricks-tip={tip}
             key={index}
-            className={`${css.item}${index === toggleIndex ? ` ${css.selectItem}` : ''}`}
-            onClick={() => handleItemClick(index)}
+            className={`${css.item}${index === toggleIndex ? ` ${css.selectItem}` : ''}${disabled ? ` ${css.disabledItem}` : ''}`}
+            onClick={() => !disabled && handleItemClick(index)}
           >
             {!index && <MoveBlock index={toggleIndex}/>}
             <div className={css.label}>{label}</div>

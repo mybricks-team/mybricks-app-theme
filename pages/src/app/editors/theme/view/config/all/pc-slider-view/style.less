@@ -49,11 +49,14 @@
 .customVariables {
   display: flex;
   flex-wrap: wrap;
+  // padding: 8px;
+
   .circel {
+    font-size: 12px;
     border-radius: 50%;
     border: 1px solid #808080;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -162,4 +165,90 @@
       }
     }
   }
+}
+
+.cssModeSelect {
+  padding-top
+  : 3px;
+}
+
+.switchIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out 0s;
+  // margin-right: 2px;
+}
+
+.switchIconOpen {
+  transform: rotate(90deg);
+}
+
+.catelogGroup {
+  width: 100%;
+
+  .catelogTitle {
+    width: 100%;
+    display: flex;
+    cursor: pointer;
+    height: 32px;
+    font-size: 12px;
+    line-height: 20px;
+    line-height: 32px;
+    font-weight: 700;
+    // padding-left: 12px;
+    // padding-right: 12px;
+  }
+
+  .catelogContent {
+    font-size: 12px;
+    width: 100%;
+    // padding: 0px 12px;
+
+    .catelogContentItem {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      margin: 3px 0px;
+      border-radius: 5px;
+      background-color: #e8e8e894;
+      cursor: pointer;
+      
+      &:hover {
+        background-color: #e8e8e8;
+      }
+
+      .colorBlock {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 12px;
+      }
+    }
+  }
+
+  .catelogContentOpen {
+    height: 100%;
+  }
+
+  .catelogContentHidden {
+    height: 0;
+    overflow: hidden;
+  }
+}
+
+.themeContainer {
+  .themeTitle {
+    height: 32px;
+    font-size: 12px;
+    line-height: 20px;
+    line-height: 32px;
+    // padding-left: 12px;
+    // padding-right: 12px;
+  }
+}
+
+.center {
+  justify-content: center;
 }

@@ -99,34 +99,37 @@ export default function Designer({ appData }) {
   }, [operable])
 
   const onPublishClick = useCallback(async () => {
-    setPublishLoading(true)
+    // setPublishLoading(true)
+    // const json = getSaveJson()
+    // save({ name: appData.fileContent.name, content: JSON.stringify(json) })
+
+    // setBeforeunload(false)
+
+    // const res = await axios.post('/api/theme/publish', {
+    //   userId: appData.user.id,
+    //   fileId: appData.fileId,
+    //   json: json.theme,
+    //   title: appData.fileContent.name
+    // })
+
+    // if (res.data.code === 1) {
+    //   message.success({
+    //     key: 'publish',
+    //     content: '发布成功',
+    //     duration: 2,
+    //   })
+
+    // } else {
+    //   message.error({
+    //     content: res.data.message || '发布失败',
+    //     duration: 2,
+    //   })
+    // }
+
+    // setPublishLoading(false)
+    
     const json = getSaveJson()
-    save({ name: appData.fileContent.name, content: JSON.stringify(json) })
-
-    setBeforeunload(false)
-
-    const res = await axios.post('/api/theme/publish', {
-      userId: appData.user.id,
-      fileId: appData.fileId,
-      json: json.theme,
-      title: appData.fileContent.name
-    })
-
-    if (res.data.code === 1) {
-      message.success({
-        key: 'publish',
-        content: '发布成功',
-        duration: 2,
-      })
-
-    } else {
-      message.error({
-        content: res.data.message || '发布失败',
-        duration: 2,
-      })
-    }
-
-    setPublishLoading(false)
+    console.log(json, 'json')
   }, [operable])
 
   useEffect(() => {
@@ -204,6 +207,7 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
     // TODO: 临时开放，需要看类似选中、悬浮、禁用状态等
     toplView: {},
     editView: {
+      width: 400,
       editorAppender(editConfig) {
         return myEditors({ editConfig, designerRef, context })
       },
@@ -225,6 +229,7 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
       }
     },
     geoView: {
+      width: 600,
       layout: 'absolute',
       scenes: {
         adder: [
