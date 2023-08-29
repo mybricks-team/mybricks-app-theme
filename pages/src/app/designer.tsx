@@ -99,37 +99,34 @@ export default function Designer({ appData }) {
   }, [operable])
 
   const onPublishClick = useCallback(async () => {
-    // setPublishLoading(true)
-    // const json = getSaveJson()
-    // save({ name: appData.fileContent.name, content: JSON.stringify(json) })
-
-    // setBeforeunload(false)
-
-    // const res = await axios.post('/api/theme/publish', {
-    //   userId: appData.user.id,
-    //   fileId: appData.fileId,
-    //   json: json.theme,
-    //   title: appData.fileContent.name
-    // })
-
-    // if (res.data.code === 1) {
-    //   message.success({
-    //     key: 'publish',
-    //     content: '发布成功',
-    //     duration: 2,
-    //   })
-
-    // } else {
-    //   message.error({
-    //     content: res.data.message || '发布失败',
-    //     duration: 2,
-    //   })
-    // }
-
-    // setPublishLoading(false)
-    
+    setPublishLoading(true)
     const json = getSaveJson()
-    console.log(json, 'json')
+    save({ name: appData.fileContent.name, content: JSON.stringify(json) })
+
+    setBeforeunload(false)
+
+    const res = await axios.post('/api/theme/publish', {
+      userId: appData.user.id,
+      fileId: appData.fileId,
+      json: json.theme,
+      title: appData.fileContent.name
+    })
+
+    if (res.data.code === 1) {
+      message.success({
+        key: 'publish',
+        content: '发布成功',
+        duration: 2,
+      })
+
+    } else {
+      message.error({
+        content: res.data.message || '发布失败',
+        duration: 2,
+      })
+    }
+
+    setPublishLoading(false)
   }, [operable])
 
   useEffect(() => {
