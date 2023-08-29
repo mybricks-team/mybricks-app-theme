@@ -13,11 +13,13 @@ import API from '@mybricks/sdk-for-app/api'
 import toolsPlugin from '@mybricks/plugin-tools'
 import versionPlugin from 'mybricks-plugin-version'
 import { Locker, Toolbar } from '@mybricks/sdk-for-app/ui'
-import { config as ThemePlugin } from '@mybricks/plugin-theme'
+// import { config as ThemePlugin } from '@mybricks/plugin-theme'
+
+import myEditors from './editors'
 
 import css from './designer.less'
 
-const SPADesigner = (window as any).mybricks.SPADesigner
+const SPADesigner = window.mybricks.SPADesigner
 // const LOCAL_DATA_KEY = '"--mybricks--'
 
 export default function Designer({ appData }) {
@@ -27,6 +29,14 @@ export default function Designer({ appData }) {
   const [saveTip, setSaveTip] = useState('')
   const [saveLoading, setSaveLoading] = useState(false)
   const [publishLoading, setPublishLoading] = useState(false)
+  const context = useMemo(() => {
+    return {
+      theme: appData.fileContent.content.theme || {
+        themes: [],
+        variables: []
+      }
+    }
+  }, [])
 
   const save = useCallback((param: { name?; shareType?; content?; icon?},
     skipMessage?: boolean) => {
@@ -58,10 +68,16 @@ export default function Designer({ appData }) {
     })
   }, [operable])
 
+  const getSaveJson = useCallback(() => {
+    const json = designerRef.current.dump()
+    json.theme = context.theme
+
+    return json
+  }, [])
+
   const onSaveClick = useCallback(() => {
     setSaveLoading(true)
-
-    const json = designerRef.current.dump()
+    const json = getSaveJson()
     save({ name: appData.fileContent.name, content: JSON.stringify(json) })
 
     setBeforeunload(false)
@@ -80,24 +96,19 @@ export default function Designer({ appData }) {
     }).catch((err) => {
       console.error(err)
     })
-
   }, [operable])
 
   const onPublishClick = useCallback(async () => {
     setPublishLoading(true)
-    const json = designerRef.current.dump()
+    const json = getSaveJson()
     save({ name: appData.fileContent.name, content: JSON.stringify(json) })
 
     setBeforeunload(false)
 
-    const toJSON = designerRef.current.toJSON()
-
-    const themesConfig = toJSON.plugins['@mybricks/plugins/theme/config']
-
     const res = await axios.post('/api/theme/publish', {
       userId: appData.user.id,
       fileId: appData.fileId,
-      json: themesConfig,
+      json: json.theme,
       title: appData.fileContent.name
     })
 
@@ -144,7 +155,7 @@ export default function Designer({ appData }) {
 
   return (
     <div className={`${css.view} fangzhou-theme`}>
-       <Toolbar title={appData.fileContent.name} updateInfo={<Toolbar.LastUpdate content={saveTip} />}>
+      <Toolbar title={appData.fileContent.name} updateInfo={<Toolbar.LastUpdate content={saveTip} />}>
         {RenderLocker}
         <Toolbar.Save
           disabled={!operable}
@@ -161,7 +172,7 @@ export default function Designer({ appData }) {
       <div className={css.designer}>
         <SPADesigner
           ref={designerRef}
-          config={spaDesignerConfig({appData})}
+          config={spaDesignerConfig({ appData, designerRef, context })}
           onEdit={onEdit}
         />
       </div>
@@ -169,10 +180,10 @@ export default function Designer({ appData }) {
   )
 }
 
-function spaDesignerConfig ({appData}) {
+function spaDesignerConfig ({ appData, designerRef, context }) {
   return {
     plugins: [
-      ThemePlugin,
+      // ThemePlugin,
       versionPlugin({
         user: appData.user,
         file: appData.fileContent || {}
@@ -182,7 +193,7 @@ function spaDesignerConfig ({appData}) {
     comLibLoader() {
       return new Promise((resolve) => {
         // TODO: 先写死
-        resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.71/2023-08-25_17-55-14/edit.js', 'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7182_1.0.55/2023-08-23_22-05-28/edit.js'])
+        resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.75/2023-08-29_14-58-57/edit.js', 'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7182_1.0.55/2023-08-23_22-05-28/edit.js'])
       })
     },
     pageContentLoader() {
@@ -192,6 +203,20 @@ function spaDesignerConfig ({appData}) {
     },
     // TODO: 临时开放，需要看类似选中、悬浮、禁用状态等
     toplView: {},
+    editView: {
+      editorAppender(editConfig) {
+        return myEditors({ editConfig, designerRef, context })
+      },
+      items(_, cate0) {
+        cate0.title = '主题'
+        cate0.items = [
+          {
+            title: '主题包配置',
+            type: 'Theme'
+          },
+        ]
+      },
+    },
     com: {
       env: {
         i18n(title) {

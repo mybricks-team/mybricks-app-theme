@@ -1,0 +1,165 @@
+@color-primary: #fa6400;
+
+.container {
+  // height: calc(100% - 25px);
+  // width: 320px;
+  width: 100%;
+  background-color: #f7f7f7;
+  overflow: auto;
+
+  :global {
+    .ant-collapse-header {
+      padding: 12px 0px !important;
+    }
+  }
+
+  .customPanel {
+    padding: 12px 8px;
+    &:first-child {
+      padding-top: 0px;
+    }
+  }
+
+  .empty {
+    .customPanel();
+    font-size: 12px;
+    line-height: 2;
+  }
+
+  .header {
+    font-size: 12px;
+    line-height: 2;
+    display: flex;
+    .title {
+      width: 38px;
+      text-align: right;
+      text-wrap: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .color {
+      margin: 0px 8px;
+    }
+    button {
+      font-size: 12px !important;
+    }
+  }
+}
+
+.customVariables {
+  display: flex;
+  flex-wrap: wrap;
+  .circel {
+    border-radius: 50%;
+    border: 1px solid #808080;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #808080;
+    margin: 0px 8px 8px 0px;
+    cursor: pointer;
+  }
+  .addIcon {
+    &:hover {
+      color: @color-primary;
+      border-color: @color-primary;
+    }
+  }
+}
+
+.themePanel {
+  width: 320px;
+  height: 100%;
+  z-index: 1000;
+  position: absolute;
+  background-color: #F7F7F7;
+  border-right: 1px solid #bbb;
+  border-left: 1px solid #bbb;
+  // box-shadow: 5px 0 10px -5px #ddd;
+
+  .header {
+    justify-content: space-between;
+    // height: 50px;
+    height: 32px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    // font-weight: 600;
+    font-weight: 700;
+    // border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #D8D8D8;
+  }
+
+  .form {
+    width: 100%;
+    padding: 0px 10px;
+
+    &Item {
+      display: flex;
+      flex-direction: row;
+      margin: 20px 0;
+      align-items: center;
+      font-size: 12px;
+
+      label {
+        width: 36px;
+        text-align: right;
+        padding-right: 5px;
+        font-size: 12px;
+    
+        i {
+          font-style: normal;
+          color: #FF0000;
+        }
+      }
+
+      .editor {
+        flex: 1;
+        display: flex;
+        position: relative;
+        padding-left: 6px;
+      }
+
+      .textEdt {
+        input, textarea {
+          border: 1px solid #DDD;
+          border-radius: 3px;
+          padding: 5px;
+          background: #FFF;
+          width: 100%;
+          line-height: 1;
+          &::placeholder {
+            overflow: hidden;
+            color: #bfbfbf;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+          &:focus {
+            // outline: 1px solid @color-primary;
+            border: 1px solid @color-primary;
+          }
+        }
+    
+        textarea {
+          min-height: 50px;
+        }
+      }
+
+      .error {
+        input {
+          border: 1px solid #FF0000 !important;
+        }
+        
+        &::after {
+          content: attr(data-err);
+          color: red;
+          position: absolute;
+          bottom: -17px;
+        }
+      }
+    }
+  }
+}
