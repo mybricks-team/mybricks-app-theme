@@ -213,17 +213,33 @@
       margin: 3px 0px;
       border-radius: 5px;
       background-color: #e8e8e894;
+      justify-content: space-between;
       cursor: pointer;
       
       &:hover {
         background-color: #e8e8e8;
       }
 
-      .colorBlock {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        margin-right: 12px;
+      .catelogContentItemInfo {
+        display: flex;
+        align-items: center;
+
+        .colorBlock {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          margin-right: 12px;
+        }
+      }
+
+      .catelogContentItemAction {
+        display: flex;
+        align-items: center;
+        .catelogContentItemActionIcon {
+          &:hover {
+            color: @color-primary;
+          }
+        }
       }
     }
   }
@@ -250,5 +266,5 @@
 }
 
 .center {
-  justify-content: center;
+  justify-content: center !important;
 }

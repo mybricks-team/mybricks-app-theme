@@ -1,22 +1,17 @@
-import React, { useRef, useMemo, useCallback, useState } from 'react'
-import { createPortal, render } from 'react-dom'
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useCallback
+} from 'react'
+import { createPortal } from 'react-dom'
 
-import { Collapse } from 'antd'
+import { CaretRightOutlined, DeleteOutlined } from '@ant-design/icons'
 
-import {
-  CodeOutlined,
-  ReloadOutlined,
-  AppstoreOutlined,
-  CaretDownOutlined,
-  CaretRightOutlined,
-  FullscreenOutlined
-} from '@ant-design/icons'
-
-import Picker from '../components/color-picker'
-import PickerEditor from '../components/color-picker/picker'
-import { generateColors, hsla2rgba } from '../utils/color'
-import { Button, PlusOutlined, Toggle } from '../../../compoments'
 import { uuid } from '../../../../../utils'
+import { generateColors, hsla2rgba } from '../utils/color'
+import PickerEditor from '../components/color-picker/picker'
+import { Button, PlusOutlined, Toggle, RemoveOutlined } from '../../../compoments'
 import { MYBRICKS_VARIABLE_CSS_CONFIG, SET_MYBRICKS_CSS_VARIABLE_LIST } from '../../../../index'
 
 import { Colorpicker } from './Colorpicker'
@@ -25,11 +20,7 @@ import type { Theme } from '../types'
 
 import css from './style.less'
 
-const { Panel } = Collapse
-
 const MYBRICKS_VARIABLE_CSS_TITLES = ['主题色分类', '成功色分类', '错误色分类', '警告色分类', '信息色分类']
-
-// , '扩展色分类'
 
 const ColorIcon = <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" data-v-6ec2bbd6=""><path d="M5.12244 13.2087L14.4632 20.0582C15.151 20.746 17.2416 19.7702 19.1332 17.8787C21.0248 15.9871 22.0005 13.8965 21.3127 13.2087L14.4632 3.86792"></path><path d="M11.6601 10.4063C14.2394 7.82703 15.4939 4.89976 14.4622 3.86806C13.4305 2.83635 10.5032 4.09089 7.92396 6.67016C5.34469 9.24942 4.09015 12.1767 5.12185 13.2084C6.15356 14.2401 9.08083 12.9856 11.6601 10.4063Z"></path><path d="M3 20.2387C3 19.2657 4.76125 16.7162 4.76125 16.7162C4.76125 16.7162 6.5225 19.2657 6.5225 20.2387C6.5225 21.2118 5.73434 22 4.76125 22C3.78816 22 3 21.2118 3 20.2387Z"></path><path d="M14.4481 12.3131H17.9706C18.9631 12.3131 19.8597 11.9026 20.5 11.2421C21.1147 10.608 21.4931 9.74347 21.4931 8.79063C21.4931 6.84533 19.9159 5.26813 17.9706 5.26813H15.4899"></path></svg>
 const TextIcon = <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" data-v-6ec2bbd6=""><path d="M12 4H4V8.44444M12 4H20V8.44444M12 4V20M12 20H15.5556M12 20H8.44444"></path></svg>
@@ -45,11 +36,7 @@ const CSS_MODE_OPTIONS = [
 ]
 
 export default function ({ data, theme, viewRef, popView }: { data: any, theme: Theme, viewRef: any, popView: any }) {
-  // defaultValue,
-  // onChange,
-  // options
   const [cssMode, setCssMode] = useState('color')
-
 
   return (
     <>
@@ -130,22 +117,26 @@ function GeneralTheme ({ data, theme }) {
             <div className={`${css.catelogContent} ${open ? css.catelogContentOpen : css.catelogContentHidden}`}>
               <Colorpicker value={theme.get(id)} onChange={(color) => onColorChange({ id, color, items })}>
                 <div className={css.catelogContentItem} data-mybricks-tip={`修改${title}将自动计算相应色值`}>
-                  <div
-                    className={css.colorBlock}
-                    style={{backgroundColor: theme.get(id)}}
-                  />
-                  <div>{title}-默认</div>
+                  <div className={css.catelogContentItemInfo}>
+                    <div
+                      className={css.colorBlock}
+                      style={{backgroundColor: theme.get(id)}}
+                    />
+                    <div>{title}-默认</div>
+                  </div>
                 </div>
               </Colorpicker>
               {Array.isArray(items) && items.map(({ id, title: childTitle }) => {
                 return (
                   <Colorpicker value={theme.get(id)} onChange={(color) => onColorChange({ id, color })}>
                     <div className={css.catelogContentItem}>
-                      <div
-                        className={css.colorBlock}
-                        style={{backgroundColor: theme.get(id)}}
-                      />
-                      <div>{title}-{childTitle}</div>
+                      <div className={css.catelogContentItemInfo}>
+                        <div
+                          className={css.colorBlock}
+                          style={{backgroundColor: theme.get(id)}}
+                        />
+                        <div>{title}-{childTitle}</div>
+                      </div>
                     </div>
                   </Colorpicker>
                 )
@@ -157,104 +148,6 @@ function GeneralTheme ({ data, theme }) {
     </>
   )
 }
-
-// 主题色分类、成功色分类、错误色分类、警告色分类、信息色分类、扩展色分类
-
-// export default function ({ data, theme, viewRef, popView }: { data: any, theme: Theme, viewRef: any, popView: any }) {
-//   return (
-//     <div className={css.container}>
-//       <VariableConfiguration
-//         viewRef={viewRef}
-//         variables={MYBRICKS_VARIABLE_CSS_CONFIG}
-//         data={data}
-//         theme={theme}
-//         root={true}
-//         popView={popView}
-//       />
-//     </div>
-//   )
-// }
-
-// function VariableConfiguration ({
-//   variables,
-//   data,
-//   theme,
-//   root = false,
-//   viewRef,
-//   popView
-// }) {
-//   // const onResetClick = useCallback((e, {id, items}) => {
-//   //   e.stopPropagation()
-//   //   const defaultColor = MYBRICKS_VARIABLE_CSS[id]
-//   //   theme.set(id, defaultColor)
-//   //   data.variables[0].config[id] = defaultColor
-//   //   generateColors({ data, theme, primaryColor: defaultColor, children: items })
-//   // }, [])
-
-//   const variablePanels = useMemo(() => {
-//     return variables.map(({ id, title, items }) => {
-//       const header = (
-//         <div className={css.header}>
-//           <div className={css.title}>
-//             {title}
-//           </div>
-//           <div className={css.color} data-mybricks-tip={root ? `修改${title}将自动计算相应色值` : ''}>
-//             <Picker data={data} theme={theme} themeItem={{id, title, items, isSeed: root}} />
-//           </div>
-//           {/* {root && (
-//             <Button
-//               size='small'
-//               shape='round'
-//               onClick={(e) => onResetClick(e, {id, items})}
-//             >
-//               重置
-//             </Button>
-//           )} */}
-//         </div>
-//       )
-//       return root ? (
-//         <Panel
-//           key={id}
-//           header={header}
-//         >
-//           {items ? (
-//             <VariableConfiguration
-//               variables={items}
-//               data={data}
-//               theme={theme}
-//               viewRef={viewRef}
-//               popView={popView}
-//             />
-//           ): (
-//             <div className={css.empty}>无关联色</div>
-//           )}
-//         </Panel>
-//       ) : (
-//         <div key={id} className={css.customPanel}>
-//           {header}
-//         </div>
-//       )
-//     })
-//   }, [])
-
-//   return (
-//     <Collapse accordion={root} ghost>
-//       {variablePanels}
-//       {root && <Panel
-//         key={'custom'}
-//         header={(
-//           <div className={css.header}>
-//             <div className={css.title}>
-//               {'自定义'}
-//             </div>
-//           </div>
-//         )}
-//       >
-//         <CustomVariables data={data} viewRef={viewRef} theme={theme} popView={popView}/>
-//       </Panel>}
-//     </Collapse>
-//   )
-// }
 
 function CustomVariables ({ data, theme, popView }) {
   const [variables, setVariables] = useState(data.variables[2].configs)
@@ -270,6 +163,21 @@ function CustomVariables ({ data, theme, popView }) {
     setVariableConfigPanelOpen(true)
     setVariableConfigPanelFormData(formData)
   }, [])
+
+  const onDeleteClick = useCallback((e, { id }) => {
+    e.stopPropagation()
+    const variables = data.variables[2].configs
+    const index = variables.findIndex((variable) => variable.id === id)
+    const variable = variables[index]
+    variables.splice(index, 1)
+    data.variables[2].configs = variables
+    SET_MYBRICKS_CSS_VARIABLE_LIST({ data, theme })
+    setVariables([...variables])
+
+    if (variable.id === variableConfigPanelFormData.id) {
+      onVariableConfigPanelCancel()
+    }
+  }, [variableConfigPanelFormData])
 
   const onVariableConfigPanelOk = useCallback((value) => {
     if (!value.id) {
@@ -318,18 +226,24 @@ function CustomVariables ({ data, theme, popView }) {
     return null
   }, [variableConfigPanelOpen, variableConfigPanelFormData])
 
-
   return (
     <div className={css.catelogGroup}>
       <div className={css.catelogContent}>
         {variables.map(({ id, key, name, value }) => {
           return (
             <div className={css.catelogContentItem} onClick={() => onEditClick({ id, key, name, value })}>
-              <div
-                className={css.colorBlock}
-                style={{backgroundColor: theme.get(key)}}
-              />
-              <div>{name}</div>
+              <div className={css.catelogContentItemInfo}>
+                <div
+                  className={css.colorBlock}
+                  style={{backgroundColor: theme.get(key)}}
+                />
+                <div>{name}</div>
+              </div>
+              <div className={css.catelogContentItemAction}>
+                <div className={css.catelogContentItemActionIcon} onClick={(e) => onDeleteClick(e, { id })}>
+                  {RemoveOutlined}
+                </div>
+              </div>
             </div>
           )
           })}
@@ -342,30 +256,6 @@ function CustomVariables ({ data, theme, popView }) {
       {themePanel}
     </div>
   )
-
-  // return (
-  //   <div className={css.customVariables}>
-  //     {variables.map(({ id, key, name, value }) => {
-  //       return (
-  //         <div
-  //           key={id}
-  //           data-mybricks-tip={name}
-  //           className={css.circel}
-  //           style={{backgroundColor: value, borderColor: value}}
-  //           onClick={() => onEditClick({ id, key, name, value })}
-  //         />
-  //       )
-  //     })}
-  //     <div
-  //       className={`${css.circel} ${css.addIcon}`}
-  //       onClick={onAddClick}
-  //       data-mybricks-tip='添加变量'
-  //     >
-  //       {PlusOutlined}
-  //     </div>
-  //     {themePanel}
-  //   </div>
-  // )
 }
 
 function ThemePanel ({
@@ -461,7 +351,7 @@ function ThemePanel ({
             />
           </div>
         </div>
-        {!edit && <div className={css.formItem}>
+        {/* {!edit && <div className={css.formItem}>
             <label>
               key
             </label>
@@ -473,7 +363,7 @@ function ThemePanel ({
                 onChange={onKeyChange}
               />
             </div>
-          </div>}
+          </div>} */}
         <div className={css.formItem}>
           <label>
             颜色
