@@ -31,8 +31,8 @@ interface ConfigViewProps extends RenderProps {
 }
 
 const TOGGLE_OPTIONS = [
-  { label: '设计语言', value: 'all' },
-  { label: '组件定制', value: 'component'}
+  { label: '设计规范', value: 'all' },
+  { label: '组件规范', value: 'component'}
 ]
 
 export const ConfigView = (props: ConfigViewProps) => {

@@ -6,6 +6,7 @@ import React, {
 } from 'react'
 
 import axios from 'axios'
+import { message } from 'antd'
 
 import { PlusOutlined } from '../compoments'
 
@@ -66,6 +67,12 @@ export const UseView = ({sdk, data, themes: themesAPI, theme: themeAPI}: UseView
         res.data.data.forEach((theme) => {
           const { title, version, namespace, content: stringContent } = theme
           const content = JSON.parse(stringContent)
+
+          if (data.themes?.length) {
+            message.success(`已添加 ${title} 主题包`)
+          } else {
+            message.success(`已将主题包替换为 ${title}`)
+          }
 
           // TODO: 第一版，直接替换
           data.themes = [{
