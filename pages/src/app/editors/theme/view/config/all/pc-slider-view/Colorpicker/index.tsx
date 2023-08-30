@@ -140,12 +140,10 @@ function ColorSketch({
 
   return (
     <div ref={ref} className={css.colorSketch}>
-      <Sketch color={value} onChange={({hexa}) => onChange(getHex(hexa))} />
+      <Sketch
+        color={value}
+        onChange={({rgba}) => onChange(`rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`)}
+      />
     </div>
   );
-}
-
-function getHex (str: string) {
-  const color = new ColorUtil(str)
-  return (color.alpha() === 1 ? color.hex() : color.hexa()).toLowerCase()
 }

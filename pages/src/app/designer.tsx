@@ -101,7 +101,7 @@ export default function Designer({ appData }) {
   const onPublishClick = useCallback(async () => {
     setPublishLoading(true)
     const json = getSaveJson()
-    save({ name: appData.fileContent.name, content: JSON.stringify(json) })
+    save({ name: appData.fileContent.name, content: JSON.stringify(json) }, true)
 
     setBeforeunload(false)
 
