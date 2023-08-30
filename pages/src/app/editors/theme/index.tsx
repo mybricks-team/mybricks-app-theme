@@ -285,6 +285,35 @@ export const MYBRICKS_VARIABLE_CSS = {
   [`${MYBRICKS_VAR_PREFIX}info-color-deprecated-border`]: '#91d5ff',
 }
 
+const DEPRECATED_CSS_VARIABLE = {
+  [`${MYBRICKS_VAR_PREFIX}primary-color-deprecated-l-35`]: '#cbe6ff',
+  [`${MYBRICKS_VAR_PREFIX}primary-color-deprecated-l-20`]: '#7ec1ff',
+  [`${MYBRICKS_VAR_PREFIX}primary-color-deprecated-t-20`]: '#46a6ff',
+  [`${MYBRICKS_VAR_PREFIX}primary-color-deprecated-t-50`]: '#8cc8ff',
+  [`${MYBRICKS_VAR_PREFIX}primary-color-deprecated-f-12`]: 'rgba(24,144,255,0.12)',
+  [`${MYBRICKS_VAR_PREFIX}primary-color-active-deprecated-f-30`]: 'rgba(230,247,255,0.3)',
+  [`${MYBRICKS_VAR_PREFIX}primary-color-active-deprecated-d-02`]: '#dcf4ff',
+
+  [`${MYBRICKS_VAR_PREFIX}success-color-deprecated-bg`]: '#f6ffed',
+  [`${MYBRICKS_VAR_PREFIX}success-color-deprecated-border`]: '#b7eb8f',
+
+  [`${MYBRICKS_VAR_PREFIX}error-color-deprecated-bg`]: '#fff2f0',
+  [`${MYBRICKS_VAR_PREFIX}error-color-deprecated-border`]: '#ffccc7',
+
+  [`${MYBRICKS_VAR_PREFIX}warning-color-deprecated-bg`]: '#fffbe6',
+  [`${MYBRICKS_VAR_PREFIX}warning-color-deprecated-border`]: '#ffe58f',
+
+  [`${MYBRICKS_VAR_PREFIX}info-color-deprecated-bg`]: '#e6f7ff',
+  [`${MYBRICKS_VAR_PREFIX}info-color-deprecated-border`]: '#91d5ff',
+}
+
+export function SET_DEPRECATED_CSS_VARIABLE ({ theme: themeAPI }) {
+  Object.entries(DEPRECATED_CSS_VARIABLE).forEach(([ key, value ]) => {
+    themeAPI.set(key, value)
+  })
+}
+
+
 export const MYBRICKS_VARIABLE_CSS_CONFIG = [
   {
     id: `${MYBRICKS_VAR_PREFIX}primary-color`,
@@ -569,6 +598,7 @@ export default function ThemeEditor ({ editConfig, designer, context }) {
   useMemo(() => {
     const data = themeContext.data
     const { variables } = data
+    const theme = themeContext.theme
 
     /**
      * TODO
@@ -577,11 +607,13 @@ export default function ThemeEditor ({ editConfig, designer, context }) {
      * 3. 后续全局配置分 系统自带、组件库配置，当前仅配置系统自带
      */
     if (!variables.length) {
-      const variables = GET_DEFAULT_VARIABLES({ theme: themeContext.theme})
+      const variables = GET_DEFAULT_VARIABLES({ theme})
       data.variables = variables
     }
 
     SET_MYBRICKS_CSS_VARIABLE_LIST(themeContext)
+
+    SET_DEPRECATED_CSS_VARIABLE({ theme })
   }, [])
 
 
