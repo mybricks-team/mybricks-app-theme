@@ -33,12 +33,17 @@ export interface RenderProps {
     getAll: () => Array<Slot>
   }
   themes: {
-    // 设置风格
+    // 设置组件风格
     setComThemes: (comThemes: Array<ComTheme>) => void
-  }
-  theme: {
+
     // 设置css变量
-    set: (key: string, value: string) => void
+    setCSSVar: (key: string, value: string) => void
+
+    // 清除css变量
+    removeCSSVar: (key: string) => void
+
+    // 获取css变量值
+    getCSSVar: (key: string) => string
   }
 }
 
@@ -58,7 +63,6 @@ export interface Data {
   }>
   variables: Array<{
     id: string
-    // config: {[key: string]: string}
     configs: Array<{
       name?: string
       key: string

@@ -1,121 +1,17 @@
-import React, { useMemo } from 'react'
+import React, {
+  useMemo,
+  useContext,
+  createContext
+} from 'react'
 
-import { UseView, ConfigView } from './view'
+import type { ReactNode } from 'react'
 
-const icon = <svg viewBox='0 0 1024 1024' version='1.1' xmlns='http://www.w3.org/2000/svg' p-id='5287' width='20' height='20'><path d='M512 51.2a460.8 460.8 0 0 0 0 921.6c78.5408 0 133.12-40.0384 139.264-102.4 2.3552-23.6544-6.5536-44.9536-15.1552-65.6384-14.336-34.5088-24.6784-59.4944 9.216-93.2864s73.5232-27.4432 119.7056-20.48c29.7984 4.5056 60.416 9.0112 89.1904 1.2288C929.5872 672.0512 972.8 606.208 972.8 512A461.312 461.312 0 0 0 512 51.2z m331.3664 601.9072c-20.48 5.5296-45.568 1.8432-71.68-2.2528-47.4112-7.0656-106.496-15.9744-154.7264 31.9488-53.4528 53.248-33.0752 102.4-18.1248 138.1376a105.2672 105.2672 0 0 1 12.1856 45.8752C604.672 927.1296 533.6064 931.84 512 931.84a419.84 419.84 0 1 1 419.84-419.84c0 43.6224-11.4688 120.1152-88.4736 141.1072z' p-id='5288' fill='#95999e'></path><path d='M235.52 512m-51.2 0a51.2 51.2 0 1 0 102.4 0 51.2 51.2 0 1 0-102.4 0Z' p-id='5289' fill='#95999e'></path><path d='M307.2 337.92m-51.2 0a51.2 51.2 0 1 0 102.4 0 51.2 51.2 0 1 0-102.4 0Z' p-id='5290' fill='#95999e'></path><path d='M471.04 245.76m-51.2 0a51.2 51.2 0 1 0 102.4 0 51.2 51.2 0 1 0-102.4 0Z' p-id='5291' fill='#95999e'></path><path d='M655.36 276.48m-51.2 0a51.2 51.2 0 1 0 102.4 0 51.2 51.2 0 1 0-102.4 0Z' p-id='5292' fill='#95999e'></path><path d='M778.24 419.84m-51.2 0a51.2 51.2 0 1 0 102.4 0 51.2 51.2 0 1 0-102.4 0Z' p-id='5293' fill='#95999e'></path></svg>
+import { ConfigView } from './view'
 
-import type { ComTheme, RenderProps, Data } from './view/type'
+import type { RenderProps, Data } from './view/type'
 
-export const use = ({sdk}) => {
-  return {
-    name: '@mybricks/plugins/theme/use',
-    namespace: '@mybricks/plugins/theme/use',
-    title: '主题包',
-    author: 'LiangLihao',
-    ['author.zh']: '梁李昊',
-    version: '1.0.0',
-    description: '主题包',
-    data: {
-      themes: []
-    },
-    contributes: {
-      sliderView: {
-        tab: {
-          title: '主题包',
-          icon,
-          apiSet: ['component', 'themes', 'theme'],
-          render: (args) => {
-            return <UseView {...args} sdk={sdk}/>
-          }
-        },
-      }
-    },
-    activate(props) {
-      const { data, theme: themeAPI, themes: themesAPI } = props
-      /**
-       * TODO
-       * 1. 目前默认支持antd样式，后续直接手动配置JSON？
-       * 2. variables 给个默认值（不配置死）
-       * 3. 后续全局配置分 系统自带、组件库配置，当前仅配置系统自带
-       */
-      if (!data.themes.length) {
-        const variables = GET_DEFAULT_VARIABLES({ theme: themeAPI})
-
-        SET_MYBRICKS_CSS_VARIABLE_LIST({ data: { variables, themes: [] }, theme: themeAPI})
-      } else {
-
-        const comThemes: Array<ComTheme> = []
-
-        data.themes.forEach(({content}) => {
-          const { themes } = content
-
-          themes.forEach(({ components }) => {
-            comThemes.push(...components)
-          })
-
-          SET_MYBRICKS_CSS_VARIABLE_LIST({ data: content, theme: themeAPI })
-        })
-
-        themesAPI.setComThemes(comThemes)
-      }
-    },
-    toJSON: ({data}) => {
-      // 没数据没关系，应用本来就配置了默认样式，直接返回即可
-      return JSON.parse(JSON.stringify(data))
-    },
-  }
-}
-
-interface ConfigViewProps extends RenderProps {
-  data: Data
-}
-
-export const config = {
-  name: '@mybricks/plugins/theme/config',
-  namespace: '@mybricks/plugins/theme/config',
-  title: '主题包配置',
-  author: 'LiangLihao',
-  ['author.zh']: '梁李昊',
-  version: '1.0.0',
-  description: '主题包配置',
-  data: {
-    themes: [],
-    variables: []
-  },
-  contributes: {
-    sliderView: {
-      tab: {
-        title: '主题包配置',
-        icon,
-        apiSet: ['component', 'themes', 'theme'],
-        render: (args) => {
-          return <ConfigView {...args}/>
-        }
-      },
-    }
-  },
-  toJSON: ({data}) => {
-    return JSON.parse(JSON.stringify(data))
-  },
-  activate(props: ConfigViewProps) {
-    const { data, theme: themeAPI } = props
-    const { variables } = data
-    /**
-     * TODO
-     * 1. 目前默认支持antd样式，后续直接手动配置JSON？
-     * 2. variables 给个默认值（不配置死）
-     * 3. 后续全局配置分 系统自带、组件库配置，当前仅配置系统自带
-     */
-    if (!variables.length) {
-      const variables = GET_DEFAULT_VARIABLES({ theme: themeAPI})
-      data.variables = variables
-    }
-
-    SET_MYBRICKS_CSS_VARIABLE_LIST(props)
-  }
-}
-
-function GET_DEFAULT_VARIABLES ({ theme: themeAPI }) {
+/** 获取默认css变量数组并设置antd@4.x css变量 */
+function GET_DEFAULT_VARIABLES ({ themes: themesAPI }: { themes: RenderProps['themes'] }) {
   const variables = []
   const mybricksConfigs: Data['variables'][0]['configs'] = []
 
@@ -161,7 +57,7 @@ function GET_DEFAULT_VARIABLES ({ theme: themeAPI }) {
   })
   
   Object.entries(ANTD_VARIABLE_CSS).forEach(([ key, value ]) => {
-    themeAPI.set(key, value)
+    themesAPI.setCSSVar(key, value)
   })
 
   // TODO
@@ -173,7 +69,8 @@ function GET_DEFAULT_VARIABLES ({ theme: themeAPI }) {
   return variables
 }
 
-export function SET_MYBRICKS_CSS_VARIABLE_LIST ({ data, theme: themeAPI }: { data: Data, theme: RenderProps['theme']}) {
+/** 设置mybrics css变量以及自定义 css 变量 */
+export function SET_MYBRICKS_CSS_VARIABLE_LIST ({ data, themes: themesAPI }: { data: Data, themes: RenderProps['themes']}) {
   const { variables } = data
   
   const MYBRICKS_CSS_VARIABLE_LIST = []
@@ -196,7 +93,7 @@ export function SET_MYBRICKS_CSS_VARIABLE_LIST ({ data, theme: themeAPI }: { dat
       options
     }
 
-    themeAPI.set(id, resetValue)
+    themesAPI.setCSSVar(id, resetValue)
 
     if (Array.isArray(items)) {
       items.forEach(({ id, title: childTitle }) => {
@@ -207,7 +104,7 @@ export function SET_MYBRICKS_CSS_VARIABLE_LIST ({ data, theme: themeAPI }: { dat
           resetValue
         })
 
-        themeAPI.set(id, resetValue)
+        themesAPI.setCSSVar(id, resetValue)
       })
     }
   })
@@ -224,15 +121,17 @@ export function SET_MYBRICKS_CSS_VARIABLE_LIST ({ data, theme: themeAPI }: { dat
       value: `var(${key})`,
       resetValue: value
     })
-    themeAPI.set(key, value)
+    themesAPI.setCSSVar(key, value)
   })
 
   window.MYBRICKS_CSS_VARIABLE_LIST = MYBRICKS_CSS_VARIABLE_LIST
 }
 
 const MYBRICKS_VARIABLE_PREFIX = 'mybricks'
+/** mybricks定义css变量前缀 */
 const MYBRICKS_VAR_PREFIX = `--${MYBRICKS_VARIABLE_PREFIX}-`
 
+/** mybricks定义css变量 */
 export const MYBRICKS_VARIABLE_CSS = {
   // 主色
   [`${MYBRICKS_VAR_PREFIX}primary-color`]: '#1890ff',
@@ -285,6 +184,7 @@ export const MYBRICKS_VARIABLE_CSS = {
   [`${MYBRICKS_VAR_PREFIX}info-color-deprecated-border`]: '#91d5ff',
 }
 
+/** antd@4.x 废弃变量 */
 const DEPRECATED_CSS_VARIABLE = {
   [`${MYBRICKS_VAR_PREFIX}primary-color-deprecated-l-35`]: '#cbe6ff',
   [`${MYBRICKS_VAR_PREFIX}primary-color-deprecated-l-20`]: '#7ec1ff',
@@ -307,13 +207,14 @@ const DEPRECATED_CSS_VARIABLE = {
   [`${MYBRICKS_VAR_PREFIX}info-color-deprecated-border`]: '#91d5ff',
 }
 
-export function SET_DEPRECATED_CSS_VARIABLE ({ theme: themeAPI }) {
+/** 设置 antd@4.x 废弃变量 */
+export function SET_DEPRECATED_CSS_VARIABLE ({ themes: themesAPI }: { themes: RenderProps['themes'] }) {
   Object.entries(DEPRECATED_CSS_VARIABLE).forEach(([ key, value ]) => {
-    themeAPI.set(key, value)
+    themesAPI.setCSSVar(key, value)
   })
 }
 
-
+/** mybricks定义css变量分类 */
 export const MYBRICKS_VARIABLE_CSS_CONFIG = [
   {
     id: `${MYBRICKS_VAR_PREFIX}primary-color`,
@@ -507,6 +408,7 @@ export const MYBRICKS_VARIABLE_CSS_CONFIG = [
   }
 ]
 
+/** antd定义css变量 */
 const ANTD_VARIABLE_CSS = {
   '--ant-primary-color': `var(${MYBRICKS_VAR_PREFIX}primary-color)`,
   '--ant-primary-color-hover': `var(${MYBRICKS_VAR_PREFIX}primary-color-hover)`,
@@ -571,8 +473,32 @@ const ANTD_VARIABLE_CSS = {
   '--antd-wave-shadow-color': 'var(--ant-primary-color)'
 }
 
-export default function ThemeEditor ({ editConfig, designer, context }) {
+interface ThemeEditorProviderPropsValue extends RenderProps {
+  data: Data
+}
 
+export interface ThemeEditorProviderProps {
+  value: ThemeEditorProviderPropsValue
+  children: ReactNode
+}
+
+const ThemeEditorContext = createContext<ThemeEditorProviderProps['value']>({} as any)
+
+export function useThemeEditorContext () {
+  const context = useContext(ThemeEditorContext)
+
+  return context
+}
+
+function StyleEditorProvider ({children, value}: ThemeEditorProviderProps) {
+  return (
+    <ThemeEditorContext.Provider value={value}>
+      {children}
+    </ThemeEditorContext.Provider>
+  )
+}
+
+export default function ThemeEditor ({ editConfig, designer, context }) {
   const themeContext = useMemo(() => {
     const { themes, components } = designer
     const { popView } = editConfig
@@ -581,13 +507,13 @@ export default function ThemeEditor ({ editConfig, designer, context }) {
       get data() {
         return context.theme
       },
-      theme: {
-        get: themes.getCSSVar,
-        set: themes.setCSSVar
-      },
-      themes: {
-        setComThemes: themes.setComThemes
-      },
+      // TODO 这里themes去掉
+      // theme: {
+      //   get: themes.getCSSVar,
+      //   set: themes.setCSSVar,
+      //   remove: themes.removeCSSVar
+      // },
+      themes,
       component: {
         getAll: components.getAll
       },
@@ -598,7 +524,7 @@ export default function ThemeEditor ({ editConfig, designer, context }) {
   useMemo(() => {
     const data = themeContext.data
     const { variables } = data
-    const theme = themeContext.theme
+    const themes = themeContext.themes
 
     /**
      * TODO
@@ -607,17 +533,18 @@ export default function ThemeEditor ({ editConfig, designer, context }) {
      * 3. 后续全局配置分 系统自带、组件库配置，当前仅配置系统自带
      */
     if (!variables.length) {
-      const variables = GET_DEFAULT_VARIABLES({ theme})
+      const variables = GET_DEFAULT_VARIABLES({ themes })
       data.variables = variables
     }
 
     SET_MYBRICKS_CSS_VARIABLE_LIST(themeContext)
 
-    SET_DEPRECATED_CSS_VARIABLE({ theme })
+    SET_DEPRECATED_CSS_VARIABLE({ themes })
   }, [])
 
-
   return (
-    <ConfigView {...themeContext}/>
+    <StyleEditorProvider value={themeContext}>
+      <ConfigView />
+    </StyleEditorProvider>
   )
 }

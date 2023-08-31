@@ -1,8 +1,6 @@
 @color-primary: #fa6400;
 
 .container {
-  // height: calc(100% - 25px);
-  // width: 320px;
   width: 100%;
   background-color: #f7f7f7;
   overflow: auto;
@@ -49,7 +47,6 @@
 .customVariables {
   display: flex;
   flex-wrap: wrap;
-  // padding: 8px;
 
   .circel {
     font-size: 12px;
@@ -80,19 +77,15 @@
   background-color: #F7F7F7;
   border-right: 1px solid #bbb;
   border-left: 1px solid #bbb;
-  // box-shadow: 5px 0 10px -5px #ddd;
 
   .header {
     justify-content: space-between;
-    // height: 50px;
     height: 32px;
     padding: 0 10px;
     display: flex;
     align-items: center;
     font-size: 14px;
-    // font-weight: 600;
     font-weight: 700;
-    // border-bottom: 1px solid #eee;
     border-bottom: 1px solid #D8D8D8;
   }
 
@@ -141,13 +134,21 @@
             text-overflow: ellipsis;
           }
           &:focus {
-            // outline: 1px solid @color-primary;
             border: 1px solid @color-primary;
           }
         }
     
         textarea {
           min-height: 50px;
+        }
+
+        .colorRectangle {
+          border-radius: 4px;
+          height: 24px;
+          width: 72px;
+          cursor: pointer;
+          position: relative;
+          box-shadow: 0 1px 4px -2px #777;
         }
       }
 
@@ -178,7 +179,6 @@
   justify-content: center;
   cursor: pointer;
   transition: transform 0.2s ease-in-out 0s;
-  // margin-right: 2px;
 }
 
 .switchIconOpen {
@@ -197,14 +197,11 @@
     line-height: 20px;
     line-height: 32px;
     font-weight: 700;
-    // padding-left: 12px;
-    // padding-right: 12px;
   }
 
   .catelogContent {
     font-size: 12px;
     width: 100%;
-    // padding: 0px 12px;
 
     .catelogContentItem {
       display: flex;
@@ -260,8 +257,6 @@
     font-size: 12px;
     line-height: 20px;
     line-height: 32px;
-    // padding-left: 12px;
-    // padding-right: 12px;
   }
 }
 

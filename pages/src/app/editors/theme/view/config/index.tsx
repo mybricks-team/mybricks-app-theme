@@ -5,7 +5,6 @@ import React, {
   useCallback
 } from 'react'
 import { createPortal } from 'react-dom'
-import type { MutableRefObject } from 'react'
 
 import {
   Button,
@@ -19,29 +18,20 @@ import {
 } from '../compoments'
 import { DesignAll } from './all'
 import { uuid, deepCopy } from '../../../utils'
+import { useThemeEditorContext } from '../../index'
 
 import type { Data, Component, RenderProps } from '../type'
 
 import viewStyle from '../view.less'
 import configStyle from './index.less'
 
-interface ConfigViewProps extends RenderProps {
-  data: Data
-  popView: any // TODO
-}
-
 const TOGGLE_OPTIONS = [
   { label: '设计规范', value: 'all' },
   { label: '组件规范', value: 'component'}
 ]
 
-export const ConfigView = (props: ConfigViewProps) => {
-  const viewRef = useRef<HTMLDivElement>()
+export const ConfigView = () => {
   const [mode, setMode] = useState('all')
-
-  useMemo(() => {
-    console.log('主题插件: ', props.data)
-  }, [])
 
   const design = useMemo(() => {
     let JSX
@@ -52,14 +42,11 @@ export const ConfigView = (props: ConfigViewProps) => {
       JSX = DesignComponent
     }
 
-    return <JSX {...props} viewRef={viewRef}/>
+    return <JSX />
   }, [mode])
 
   return (
-    <div className={viewStyle.view} ref={viewRef}>
-      {/* <div className={viewStyle.header}>
-        主题包配置
-      </div> */}
+    <div className={viewStyle.view}>
       <Toggle
         defaultValue={mode}
         options={TOGGLE_OPTIONS}
@@ -68,10 +55,6 @@ export const ConfigView = (props: ConfigViewProps) => {
       {design}
     </div>
   )
-}
-
-interface DesignProps extends ConfigViewProps {
-  viewRef: MutableRefObject<HTMLDivElement>
 }
 
 function initThemeInfo (pageComponents: Array<Component>, themes: Data['themes']) {
@@ -160,7 +143,8 @@ function initThemeInfo (pageComponents: Array<Component>, themes: Data['themes']
   }
 }
 
-function DesignComponent ({ data, viewRef, component }: DesignProps) {
+function DesignComponent () {
+  const { data, component } = useThemeEditorContext()
   const [themePanlOpen, setThemePanlOpen] = useState(false)
   const [themePanelFormData, setThemePanelFormData] = useState(null)
   const [themes, setThemes] = useState<Data['themes']>([])
@@ -484,7 +468,7 @@ function ThemePanel ({
 
   return createPortal(
     <div className={configStyle.themePanel} style={style} key={formData}>
-      <div className={`${viewStyle.header} ${configStyle.header}`}>
+      <div className={configStyle.header}>
         <div>
           {title}
         </div>

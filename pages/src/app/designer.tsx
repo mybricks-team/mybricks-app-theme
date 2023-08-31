@@ -8,7 +8,7 @@ import React, {
 
 import axios from 'axios'
 import moment from 'moment'
-import { message } from 'antd'
+import { message, Button } from 'antd'
 import API from '@mybricks/sdk-for-app/api'
 import toolsPlugin from '@mybricks/plugin-tools'
 import versionPlugin from 'mybricks-plugin-version'
@@ -154,7 +154,7 @@ export default function Designer({ appData }) {
   }, [])
 
   return (
-    <div className={`${css.view} fangzhou-theme`}>
+    <div className={`${css.view} `}>
       <Toolbar title={appData.fileContent.name} updateInfo={<Toolbar.LastUpdate content={saveTip} />}>
         {RenderLocker}
         <Toolbar.Save
@@ -223,6 +223,7 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
         i18n(title) {
           return title
         },
+        design: true
       }
     },
     geoView: {
