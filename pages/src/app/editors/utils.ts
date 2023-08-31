@@ -47,3 +47,7 @@ export function deepCopy(obj: any, cache: any = []) {
 
   return copy
 }
+
+class DomToImage {
+  
+}

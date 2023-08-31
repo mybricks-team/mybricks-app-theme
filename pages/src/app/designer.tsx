@@ -10,7 +10,7 @@ import axios from 'axios'
 import moment from 'moment'
 import { message, Button } from 'antd'
 import API from '@mybricks/sdk-for-app/api'
-import toolsPlugin from '@mybricks/plugin-tools'
+// import toolsPlugin from '@mybricks/plugin-tools'
 import versionPlugin from 'mybricks-plugin-version'
 import { Locker, Toolbar } from '@mybricks/sdk-for-app/ui'
 // import { config as ThemePlugin } from '@mybricks/plugin-theme'
@@ -23,7 +23,7 @@ const SPADesigner = window.mybricks.SPADesigner
 // const LOCAL_DATA_KEY = '"--mybricks--'
 
 export default function Designer({ appData }) {
-  const designerRef = useRef<{ dump: () => any, toJSON: () => any, getPlugin: (namespace: string) => any, geoView: { canvasDom } }>()
+  const designerRef = useRef<{ dump: () => any, toJSON: () => any, geoView: { canvasDom }, loadContent: (content: any) => void }>()
   const [operable, setOperable] = useState(false)
   const [beforeunload, setBeforeunload] = useState(false)
   const [saveTip, setSaveTip] = useState('')
@@ -154,7 +154,7 @@ export default function Designer({ appData }) {
   }, [])
 
   return (
-    <div className={`${css.view} `}>
+    <div className={`${css.view} fangzhou-theme`}>
       <Toolbar title={appData.fileContent.name} updateInfo={<Toolbar.LastUpdate content={saveTip} />}>
         {RenderLocker}
         <Toolbar.Save
@@ -168,6 +168,24 @@ export default function Designer({ appData }) {
           loading={publishLoading}
           onClick={onPublishClick}
         >发布</Toolbar.Button>
+        <Toolbar.Tools
+          onImport={(value) => {
+            try {
+              const { content, theme } = JSON.parse(value)
+              context.theme = theme
+              designerRef.current.loadContent(content)
+            } catch (e) {
+              message.error(e)
+              console.error(e)
+            }
+          }}
+          getExportDumpJSON={() => {
+            return getSaveJson()
+          }}
+          getExportToJSON={() => {
+            return designerRef.current.toJSON()
+          }}
+        />
       </Toolbar>
       <div className={css.designer}>
         <SPADesigner
@@ -188,7 +206,7 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
         user: appData.user,
         file: appData.fileContent || {}
       }),
-      toolsPlugin(),
+      // toolsPlugin(),
     ],
     comLibLoader() {
       return new Promise((resolve) => {

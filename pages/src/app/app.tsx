@@ -1,6 +1,6 @@
 import React from 'react'
 
-import {View} from '@mybricks/sdk-for-app/ui'
+import { View } from '@mybricks/sdk-for-app/ui'
 
 import Designer from './designer'
 

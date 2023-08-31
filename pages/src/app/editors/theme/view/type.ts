@@ -8,6 +8,7 @@ export interface CSSFromStyle {
 export interface Component {
   id: string
   title: string
+  dom: HTMLDivElement
   def: {
     namespace: string
     version: string
