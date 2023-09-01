@@ -507,12 +507,6 @@ export default function ThemeEditor ({ editConfig, designer, context }) {
       get data() {
         return context.theme
       },
-      // TODO 这里themes去掉
-      // theme: {
-      //   get: themes.getCSSVar,
-      //   set: themes.setCSSVar,
-      //   remove: themes.removeCSSVar
-      // },
       themes,
       component: {
         getAll: components.getAll

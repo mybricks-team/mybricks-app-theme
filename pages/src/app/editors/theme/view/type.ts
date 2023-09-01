@@ -43,6 +43,9 @@ export interface RenderProps {
     // 清除css变量
     removeCSSVar: (key: string) => void
 
+    // 一次性清除所有css变量
+    clearCSSVar: () => void
+
     // 获取css变量值
     getCSSVar: (key: string) => string
   }
