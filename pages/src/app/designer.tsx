@@ -16,6 +16,7 @@ import { Locker, Toolbar } from '@mybricks/sdk-for-app/ui'
 // import { config as ThemePlugin } from '@mybricks/plugin-theme'
 
 import myEditors from './editors'
+import { traverse, initThemeInfo } from './editors/theme/view/config'
 
 import css from './designer.less'
 
@@ -23,7 +24,15 @@ const SPADesigner = window.mybricks.SPADesigner
 // const LOCAL_DATA_KEY = '"--mybricks--'
 
 export default function Designer({ appData }) {
-  const designerRef = useRef<{ dump: () => any, toJSON: () => any, geoView: { canvasDom }, loadContent: (content: any) => void }>()
+  const designerRef = useRef<{ 
+    dump: () => any, 
+    toJSON: () => any, 
+    geoView: { canvasDom }, 
+    loadContent: (content: any) => void,
+    components: {
+      getAll: () => any
+    }
+  }>()
   const [operable, setOperable] = useState(false)
   const [beforeunload, setBeforeunload] = useState(false)
   const [saveTip, setSaveTip] = useState('')
@@ -70,6 +79,9 @@ export default function Designer({ appData }) {
 
   const getSaveJson = useCallback(() => {
     const json = designerRef.current.dump()
+    const { themes } = initThemeInfo(traverse(designerRef.current.components.getAll()).reduce((f, s) => [...f, ...s], []), context.theme.themes)
+    
+    context.theme.themes = themes
     json.theme = context.theme
 
     return json

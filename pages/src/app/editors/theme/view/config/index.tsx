@@ -20,7 +20,7 @@ import { DesignAll } from './all'
 import { uuid, deepCopy } from '../../../utils'
 import { useThemeEditorContext } from '../../index'
 
-import type { Data, Component, RenderProps } from '../type'
+import type { Data, Component } from '../type'
 
 import viewStyle from '../view.less'
 import configStyle from './index.less'
@@ -57,82 +57,77 @@ export const ConfigView = () => {
   )
 }
 
-function initThemeInfo (pageComponents: Array<Component>, themes: Data['themes']) {
+export function initThemeInfo (pageComponents: Array<Component>, themes: Data['themes']) {
+  
+  
   const namespaceToAllMap = {}
   const namespaceMap = {}
   const themeIdToThemeMap = {}
-  const finalThemes = deepCopy(themes)
+  const copyThemes = deepCopy(themes)
   const notInPageNamespaceMap = {}
   
-  finalThemes.forEach(({namespace}) => {
+  copyThemes.forEach(({ namespace }) => {
     if (!namespaceMap[namespace]) {
       namespaceMap[namespace] = true
       notInPageNamespaceMap[namespace] = true
     }
   })
 
-  function traverse (components: Array<Component>) {
-    if (Array.isArray(components)) {
-      components.forEach(({
-        id,
-        def: {
-          title: defTitle,
-          namespace
-        },
-        model: {
-          css
-        },
-        slots,
-        title
-      }) => {
+  pageComponents.forEach(({
+    id,
+    def: {
+      title: defTitle,
+      namespace
+    },
+    model: {
+      css
+    },
+    title
+  }) => {
 
-        Reflect.deleteProperty(notInPageNamespaceMap, namespace)
+    Reflect.deleteProperty(notInPageNamespaceMap, namespace)
 
-        if (!namespaceMap[namespace]) {
-          namespaceMap[namespace] = true
-          finalThemes.push({
-            namespace,
-            components: []
-          })
-        }
-
-        if (!namespaceToAllMap[namespace]) {
-          namespaceToAllMap[namespace] = {
-            title: defTitle,
-            options: []
-          }
-        }
-
-        if (css) {
-          themeIdToThemeMap[id] = {
-            id,
-            title,
-            namespace,
-            styleAry: css
-          }
-          namespaceToAllMap[namespace].options.push({label: title, value: id})
-        }
-
-        if (Array.isArray(slots)) {
-          slots.forEach((slot) => {
-            traverse(slot.comAry)
-          })
-        }
+    if (!namespaceMap[namespace]) {
+      namespaceMap[namespace] = true
+      copyThemes.push({
+        namespace,
+        components: []
       })
     }
-  }
 
-  traverse(pageComponents)
+    if (!namespaceToAllMap[namespace]) {
+      namespaceToAllMap[namespace] = {
+        title: defTitle,
+        options: []
+      }
+    }
 
-  /**
-   * TODO: 
-   * 1. 删除了所有某一类组件
-   * 2. 删除了某一定制组件
-   */
-  Object.keys(notInPageNamespaceMap).forEach((key) => {
-    const index = finalThemes.findIndex(({ namespace }) => namespace === key)
-    if (index !== -1) {
-      finalThemes.splice(index, 1)
+    if (css) {
+      themeIdToThemeMap[id] = {
+        id,
+        title,
+        namespace,
+        styleAry: css
+      }
+      namespaceToAllMap[namespace].options.push({label: title, value: id})
+    }
+  })
+
+  const finalThemes = []
+
+  copyThemes.forEach(({ namespace, components }) => {
+    if (!notInPageNamespaceMap[namespace]) {
+      const finalComponents = []
+      finalThemes.push({
+        namespace,
+        components: finalComponents
+      })
+      components.forEach((component) => {
+        const theme = themeIdToThemeMap[component.themeId]
+        if (theme) {
+          finalComponents.push({ ...component, styleAry: theme.styleAry })
+        }
+      })
     }
   })
 
@@ -141,6 +136,23 @@ function initThemeInfo (pageComponents: Array<Component>, themes: Data['themes']
     namespaceToAllMap,
     themeIdToThemeMap
   }
+}
+
+export function traverse (slots) {
+  return slots.map(({ comAry }) => {
+    if (Array.isArray(comAry)) {
+      return comAry.map((com) => {
+        const { slots } = com
+        if (Array.isArray(slots)) {
+          return [com, ...traverse(slots).reduce((f, s) => [...f, ...s], [])]
+        }
+
+        return [com]
+      })
+    }
+
+    return []
+  }).reduce((f, s) => [...f, ...s])
 }
 
 function DesignComponent () {
@@ -152,8 +164,7 @@ function DesignComponent () {
   const [themeExpandMap, setThemeExpandMap] = useState({})
 
   const { namespaceToAllMap, themeIdToThemeMap } = useMemo(() => {
-    const { themes, ...other } = initThemeInfo(component.getAll().map((slot) => slot.comAry).reduce((f, s) => [...f, ...s]), data.themes)
-    
+    const { themes, ...other } = initThemeInfo(traverse(component.getAll()).reduce((f, s) => [...f, ...s], []), data.themes)
     data.themes = themes
     setThemes(themes)
 
