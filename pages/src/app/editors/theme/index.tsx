@@ -529,6 +529,8 @@ export default function ThemeEditor ({ editConfig, designer, context }) {
     if (!variables.length) {
       const variables = GET_DEFAULT_VARIABLES({ themes })
       data.variables = variables
+    } else {
+      GET_DEFAULT_VARIABLES({ themes })
     }
 
     SET_MYBRICKS_CSS_VARIABLE_LIST(themeContext)
