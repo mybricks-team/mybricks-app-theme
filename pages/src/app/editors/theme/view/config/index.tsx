@@ -152,7 +152,7 @@ export function traverse (slots) {
     }
 
     return []
-  }).reduce((f, s) => [...f, ...s])
+  }).reduce((f, s) => [...f, ...s], [])
 }
 
 function DesignComponent () {
