@@ -475,20 +475,12 @@ function ThemePanel ({
       const { themeId } = result
       const option = options.find((option) => option.value === themeId)
 
-      domToImage.toPng(option.dom.firstChild)
+      domToImage.toSvg(option.dom.firstChild)
         .then((dataUrl) => {
-          const binaryString = window.atob(dataUrl.split(',')[1])
-          const length = binaryString.length
-          const binaryArray = new Uint8Array(length)
-
-          for (let i = 0; i < length; i++) {
-            binaryArray[i] = binaryString.charCodeAt(i)
-          }
           API.Upload.toOss({
-            // @ts-ignore
-            content: binaryArray,
+            content: dataUrl.replace('data:image/svg+xml;charset=utf-8,', ''),
             folderPath: '/theme_pack_app',
-            fileName: `${uuid()}_${themeId}.png`
+            fileName: `${uuid()}_${themeId}.svg`
           }).then((value: any) => {
             result.previewUrl = value.url
             message.destroy(messageKey)
@@ -505,6 +497,37 @@ function ThemePanel ({
           setSaveLoading(false)
           onOk(result)
         })
+
+      // domToImage.toPng(option.dom.firstChild)
+      //   .then((dataUrl) => {
+      //     const binaryString = window.atob(dataUrl.split(',')[1])
+      //     const length = binaryString.length
+      //     const binaryArray = new Uint8Array(length)
+
+      //     for (let i = 0; i < length; i++) {
+      //       binaryArray[i] = binaryString.charCodeAt(i)
+      //     }
+      //     API.Upload.toOss({
+      //       // @ts-ignore
+      //       content: binaryArray,
+      //       folderPath: '/theme_pack_app',
+      //       fileName: `${uuid()}_${themeId}.png`
+      //     }).then((value: any) => {
+      //       result.previewUrl = value.url
+      //       message.destroy(messageKey)
+      //       setSaveLoading(false)
+      //       onOk(result)
+      //     }).catch((error) => {
+      //       console.error('预览图上传失败: ', error)
+      //       setSaveLoading(false)
+      //       onOk(result)
+      //     })
+      //   })
+      //   .catch((error) => {
+      //     console.error('截图失败: ', error)
+      //     setSaveLoading(false)
+      //     onOk(result)
+      //   })
     }
   }, [saveLoading])
 
