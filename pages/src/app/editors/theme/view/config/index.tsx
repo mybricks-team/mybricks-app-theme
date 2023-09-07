@@ -6,6 +6,10 @@ import React, {
 } from 'react'
 import { createPortal } from 'react-dom'
 
+import { message } from 'antd'
+import domToImage from 'dom-to-image'
+import API from '/Users/lianglihao/Documents/GitHub/sdk-for-app/src/api'
+
 import {
   Button,
   Select,
@@ -82,7 +86,8 @@ export function initThemeInfo (pageComponents: Array<Component>, themes: Data['t
     model: {
       css
     },
-    title
+    title,
+    dom
   }) => {
 
     Reflect.deleteProperty(notInPageNamespaceMap, namespace)
@@ -109,7 +114,7 @@ export function initThemeInfo (pageComponents: Array<Component>, themes: Data['t
         namespace,
         styleAry: css
       }
-      namespaceToAllMap[namespace].options.push({label: title, value: id})
+      namespaceToAllMap[namespace].options.push({label: title, value: id, dom})
     }
   })
 
@@ -175,18 +180,20 @@ function DesignComponent () {
     id,
     title,
     themeId,
-    namespace
+    namespace,
+    previewUrl
   }: {
     id: string
     title?: string
     themeId?: string
     namespace: string
+    previewUrl?: string
   }, operate) => {
     const themeIndex = data.themes.findIndex((theme) => theme.namespace === namespace)
     const components = data.themes[themeIndex].components
     switch (operate) {
       case 'add':
-        components.push({...themeIdToThemeMap[themeId], title, id: uuid(), themeId, isDefault: components.length ? false : true})
+        components.push({...themeIdToThemeMap[themeId], title, id: uuid(), themeId, previewUrl, isDefault: components.length ? false : true})
         break
       case 'delete':
         const deleteIndex = components.findIndex((component) => component.id === id)
@@ -199,7 +206,7 @@ function DesignComponent () {
       case 'edit':
         const editIndex = components.findIndex((component) => component.id === id)
         const editComponent = components[editIndex]
-        components.splice(editIndex, 1, {...themeIdToThemeMap[themeId], title, id, themeId, isDefault: editComponent.isDefault})
+        components.splice(editIndex, 1, {...themeIdToThemeMap[themeId], title, id, themeId, previewUrl, isDefault: editComponent.isDefault})
         break
       case 'default':
         components.forEach((component) => {
@@ -433,6 +440,7 @@ function ThemePanel ({
   const idRef = useRef<HTMLDivElement>()
   const titleRef = useRef<HTMLDivElement>()
   const [formData] = useState({ ...defaultValue })
+  const [saveLoading, setSaveLoading] = useState(false)
 
   const validate = useCallback(() => {
     const title = formData.title?.trim()
@@ -455,12 +463,50 @@ function ThemePanel ({
     return result
   }, [])
 
-  const onSaveClick = useCallback(() => {
+  const onSaveClick = useCallback(async () => {
+    if (saveLoading) {
+      return
+    }
     const result = validate()
     if (result) {
-      onOk(result)
+      const messageKey = 'upload' + uuid()
+      message.loading({ content: '预览图生成中...', key: messageKey });
+      setSaveLoading(true)
+      const { themeId } = result
+      const option = options.find((option) => option.value === themeId)
+
+      domToImage.toPng(option.dom.firstChild)
+        .then((dataUrl) => {
+          const binaryString = window.atob(dataUrl.split(',')[1])
+          const length = binaryString.length
+          const binaryArray = new Uint8Array(length)
+
+          for (let i = 0; i < length; i++) {
+            binaryArray[i] = binaryString.charCodeAt(i)
+          }
+          API.Upload.toOss({
+            // @ts-ignore
+            content: binaryArray,
+            folderPath: '/theme_pack_app',
+            fileName: `${uuid()}_${themeId}.png`
+          }).then((value: any) => {
+            result.previewUrl = value.url
+            message.destroy(messageKey)
+            setSaveLoading(false)
+            onOk(result)
+          }).catch((error) => {
+            console.error('预览图上传失败: ', error)
+            setSaveLoading(false)
+            onOk(result)
+          })
+        })
+        .catch((error) => {
+          console.error('截图失败: ', error)
+          setSaveLoading(false)
+          onOk(result)
+        })
     }
-  }, [])
+  }, [saveLoading])
 
   const onTitleInputChange = useCallback((e) => {
     const value = e.target.value.trim()
