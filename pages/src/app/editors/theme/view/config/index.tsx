@@ -487,7 +487,7 @@ function ThemePanel ({
       copyDom.style.height = 'fit-content'
       copyDom.style.zIndex = '-1'
 
-      const domParent = dom.parentElement.parentElement.parentElement
+      const domParent = dom.parentElement.parentElement
       domParent.appendChild(copyDom)
       // console.timeEnd('克隆耗时: ')
 
