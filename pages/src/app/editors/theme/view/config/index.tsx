@@ -28,6 +28,7 @@ import type { Data, Component } from '../type'
 
 import viewStyle from '../view.less'
 import configStyle from './index.less'
+import { useUpdateEffect } from '../hooks'
 
 const TOGGLE_OPTIONS = [
   { label: '设计规范', value: 'all' },
@@ -35,28 +36,64 @@ const TOGGLE_OPTIONS = [
 ]
 
 export const ConfigView = () => {
-  const [mode, setMode] = useState('all')
-
-  const design = useMemo(() => {
-    let JSX
-
-    if (mode === 'all') {
-      JSX = DesignAll
-    } else {
-      JSX = DesignComponent
+  const [{ all, component }, setMode] = useState({
+    all: {
+      open: true,
+      show: true
+    },
+    component: {
+      open: false,
+      show: false
     }
+  })
 
-    return <JSX />
-  }, [mode])
+  const onToggleChange = useCallback((value) => {
+    if (value === 'all') {
+      setMode(() => {
+        return {
+          all: {
+            open: true,
+            show: true
+          },
+          component: {
+            open: true,
+            show: false
+          }
+        }
+      })
+    } else {
+      setMode(() => {
+        return {
+          all: {
+            open: true,
+            show: false
+          },
+          component: {
+            open: true,
+            show: true
+          }
+        }
+      })
+    }
+  }, [])
 
   return (
     <div className={viewStyle.view}>
       <Toggle
-        defaultValue={mode}
+        defaultValue={'all'}
         options={TOGGLE_OPTIONS}
-        onChange={setMode}
+        onChange={onToggleChange}
       />
-      {design}
+      {all.open ? (
+        <div style={{display: all.show ? 'inline' : 'none'}}>
+          <DesignAll />
+        </div>
+      ) : null}
+      {component.open ? (
+        <div style={{display: component.show ? 'inline' : 'none'}}>
+          <DesignComponent />
+        </div>
+      ) : null}
     </div>
   )
 }
