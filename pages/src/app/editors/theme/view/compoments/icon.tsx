@@ -19,7 +19,7 @@ export const EditOutlined = (
 )
 
 export const ArrorRightOutlined = (
-	<svg width='16' height='16' viewBox='0 0 1057 1024'>
+	<svg width='1em' height='1em' viewBox='0 0 1057 1024'>
 		<path d='M342.016 214.016l468.010667 297.984-468.010667 297.984 0-596.010667z'/>
 	</svg>
 )
