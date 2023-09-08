@@ -474,9 +474,29 @@ function ThemePanel ({
       setSaveLoading(true)
       const { themeId } = result
       const option = options.find((option) => option.value === themeId)
+      const dom = option.dom
+      // console.time('克隆耗时: ')
+      const copyDom = dom.cloneNode(true)
 
-      domToImage.toSvg(option.dom.firstChild)
+      copyDom.style.top = '0px'
+      copyDom.style.left = '0px'
+      copyDom.style.right = '0px'
+      copyDom.style.bottom = '0px'
+      copyDom.style.position = 'relative'
+      copyDom.style.width = 'fit-content'
+      copyDom.style.height = 'fit-content'
+      copyDom.style.zIndex = '-1'
+
+      const domParent = dom.parentElement.parentElement.parentElement
+      domParent.appendChild(copyDom)
+      // console.timeEnd('克隆耗时: ')
+
+      // console.time('截图耗时: ')
+      domToImage.toSvg(copyDom)
         .then((dataUrl) => {
+          // console.timeEnd('截图耗时: ')
+          domParent.removeChild(copyDom)
+
           API.Upload.toOss({
             content: dataUrl.replace('data:image/svg+xml;charset=utf-8,', ''),
             folderPath: '/theme_pack_app',
