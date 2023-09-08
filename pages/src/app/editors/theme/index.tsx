@@ -538,6 +538,14 @@ export default function ThemeEditor ({ editConfig, designer, context }) {
     SET_DEPRECATED_CSS_VARIABLE({ themes })
   }, [])
 
+  return {
+    render: (
+      <StyleEditorProvider value={themeContext}>
+        <ConfigView />
+      </StyleEditorProvider>
+    )
+  }
+
   return (
     <StyleEditorProvider value={themeContext}>
       <ConfigView />

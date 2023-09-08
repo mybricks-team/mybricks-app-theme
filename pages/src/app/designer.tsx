@@ -239,7 +239,7 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
         return myEditors({ editConfig, designerRef, context })
       },
       items(_, cate0) {
-        cate0.title = '主题'
+        cate0.title = '主题包'
         cate0.items = [
           {
             title: '主题包配置',
