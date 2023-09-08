@@ -1,94 +1,94 @@
 @import url('../view.less');
 
-.themePanel {
-  width: 320px;
-  height: 100%;
-  z-index: 1000;
-  position: absolute;
-  background-color: #F7F7F7;
-  border-right: 1px solid #bbb;
-  border-left: 1px solid #bbb;
+// .themePanel {
+//   width: 320px;
+//   height: 100%;
+//   z-index: 1000;
+//   position: absolute;
+//   background-color: #F7F7F7;
+//   border-right: 1px solid #bbb;
+//   border-left: 1px solid #bbb;
 
-  .header {
-    justify-content: space-between;
-    height: 32px;
-    padding: 0 10px;
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    font-weight: 700;
-    border-bottom: 1px solid #D8D8D8;
-  }
+//   .header {
+//     justify-content: space-between;
+//     height: 32px;
+//     padding: 0 10px;
+//     display: flex;
+//     align-items: center;
+//     font-size: 14px;
+//     font-weight: 700;
+//     border-bottom: 1px solid #D8D8D8;
+//   }
 
-  .form {
-    width: 100%;
-    padding: 0px 10px;
+//   .form {
+//     width: 100%;
+//     padding: 0px 10px;
 
-    &Item {
-      display: flex;
-      flex-direction: row;
-      margin: 20px 0;
-      align-items: center;
-      font-size: 12px;
+//     &Item {
+//       display: flex;
+//       flex-direction: row;
+//       margin: 20px 0;
+//       align-items: center;
+//       font-size: 12px;
 
-      label {
-        width: 36px;
-        text-align: right;
-        padding-right: 5px;
-        font-size: 12px;
+//       label {
+//         width: 36px;
+//         text-align: right;
+//         padding-right: 5px;
+//         font-size: 12px;
     
-        i {
-          font-style: normal;
-          color: #FF0000;
-        }
-      }
+//         i {
+//           font-style: normal;
+//           color: #FF0000;
+//         }
+//       }
 
-      .editor {
-        flex: 1;
-        display: flex;
-        position: relative;
-        padding-left: 6px;
-      }
+//       .editor {
+//         flex: 1;
+//         display: flex;
+//         position: relative;
+//         padding-left: 6px;
+//       }
 
-      .textEdt {
-        input, textarea {
-          border: 1px solid #DDD;
-          border-radius: 3px;
-          padding: 5px;
-          background: #FFF;
-          width: 100%;
-          line-height: 1;
-          &::placeholder {
-            overflow: hidden;
-            color: #bfbfbf;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-          }
-          &:focus {
-            border: 1px solid @color-primary;
-          }
-        }
+//       .textEdt {
+//         input, textarea {
+//           border: 1px solid #DDD;
+//           border-radius: 3px;
+//           padding: 5px;
+//           background: #FFF;
+//           width: 100%;
+//           line-height: 1;
+//           &::placeholder {
+//             overflow: hidden;
+//             color: #bfbfbf;
+//             white-space: nowrap;
+//             text-overflow: ellipsis;
+//           }
+//           &:focus {
+//             border: 1px solid @color-primary;
+//           }
+//         }
     
-        textarea {
-          min-height: 50px;
-        }
-      }
+//         textarea {
+//           min-height: 50px;
+//         }
+//       }
 
-      .error {
-        input {
-          border: 1px solid #FF0000 !important;
-        }
+//       .error {
+//         input {
+//           border: 1px solid #FF0000 !important;
+//         }
         
-        &::after {
-          content: attr(data-err);
-          color: red;
-          position: absolute;
-          bottom: -17px;
-        }
-      }
-    }
-  }
-}
+//         &::after {
+//           content: attr(data-err);
+//           color: red;
+//           position: absolute;
+//           bottom: -17px;
+//         }
+//       }
+//     }
+//   }
+// }
 
 .themeList {
   display: flex;
@@ -203,5 +203,85 @@
   .itemPanelOpen {
     display: block;
     height: fit-content;
+  }
+}
+
+.popView {
+  .toolbar {
+    height: 45px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    border-bottom: 1px solid #F7F7F7;
+    padding-right: 12px;
+  }
+
+  .form {
+    width: 100%;
+    padding: 0px 10px;
+
+    &Item {
+      display: flex;
+      flex-direction: row;
+      margin: 20px 0;
+      align-items: center;
+      font-size: 12px;
+
+      label {
+        width: 36px;
+        text-align: right;
+        padding-right: 5px;
+        font-size: 12px;
+    
+        i {
+          font-style: normal;
+          color: #FF0000;
+        }
+      }
+
+      .editor {
+        flex: 1;
+        display: flex;
+        position: relative;
+        padding-left: 6px;
+      }
+
+      .textEdt {
+        input, textarea {
+          border: 1px solid #DDD;
+          border-radius: 3px;
+          padding: 5px;
+          background: #FFF;
+          width: 100%;
+          line-height: 1;
+          &::placeholder {
+            overflow: hidden;
+            color: #bfbfbf;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+          &:focus {
+            border: 1px solid @color-primary;
+          }
+        }
+    
+        textarea {
+          min-height: 50px;
+        }
+      }
+
+      .error {
+        input {
+          border: 1px solid #FF0000 !important;
+        }
+        
+        &::after {
+          content: attr(data-err);
+          color: red;
+          position: absolute;
+          bottom: -17px;
+        }
+      }
+    }
   }
 }

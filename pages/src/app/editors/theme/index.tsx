@@ -475,6 +475,7 @@ const ANTD_VARIABLE_CSS = {
 
 interface ThemeEditorProviderPropsValue extends RenderProps {
   data: Data
+  popView: any
 }
 
 export interface ThemeEditorProviderProps {
@@ -545,10 +546,4 @@ export default function ThemeEditor ({ editConfig, designer, context }) {
       </StyleEditorProvider>
     )
   }
-
-  return (
-    <StyleEditorProvider value={themeContext}>
-      <ConfigView />
-    </StyleEditorProvider>
-  )
 }
