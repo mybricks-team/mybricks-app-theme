@@ -8,7 +8,7 @@ import { createPortal } from 'react-dom'
 
 import { message } from 'antd'
 import domToImage from 'dom-to-image'
-import API from '/Users/lianglihao/Documents/GitHub/sdk-for-app/src/api'
+import API from '@mybricks/sdk-for-app/api'
 
 import {
   Button,
