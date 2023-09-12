@@ -222,8 +222,10 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
     ],
     comLibLoader() {
       return new Promise((resolve) => {
+        const localComlibs = JSON.parse(localStorage.getItem('MYBRICKS_APP_THEME_COMLIBS'))
+
         // TODO: 先写死
-        resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.88/2023-09-07_21-40-45/edit.js', 'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7182_1.0.60/2023-09-04_21-27-57/edit.js'])
+        resolve(localComlibs || ['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.88/2023-09-07_21-40-45/edit.js', 'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7182_1.0.60/2023-09-04_21-27-57/edit.js'])
       })
     },
     pageContentLoader() {
