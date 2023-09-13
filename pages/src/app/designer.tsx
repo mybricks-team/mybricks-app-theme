@@ -39,11 +39,13 @@ export default function Designer({ appData }) {
   const [saveLoading, setSaveLoading] = useState(false)
   const [publishLoading, setPublishLoading] = useState(false)
   const context = useMemo(() => {
+    const content = appData.fileContent.content
     return {
-      theme: appData.fileContent.content.theme || {
+      theme: content.theme || {
         themes: [],
         variables: []
-      }
+      },
+      componentType: content.componentType || 'PC'
     }
   }, [])
 
@@ -83,6 +85,7 @@ export default function Designer({ appData }) {
     
     context.theme.themes = themes
     json.theme = context.theme
+    json.componentType = context.componentType
 
     return json
   }, [])
