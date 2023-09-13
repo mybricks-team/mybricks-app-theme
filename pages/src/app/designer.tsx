@@ -211,6 +211,9 @@ export default function Designer({ appData }) {
 }
 
 function spaDesignerConfig ({ appData, designerRef, context }) {
+  const content = appData.fileContent?.content || {}
+  const isH5 = content.componentType === 'H5'
+
   return {
     plugins: [
       // ThemePlugin,
@@ -222,10 +225,16 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
     ],
     comLibLoader() {
       return new Promise((resolve) => {
-        const localComlibs = JSON.parse(localStorage.getItem('MYBRICKS_APP_THEME_COMLIBS'))
-
+        
         // TODO: 先写死
-        resolve(localComlibs || ['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.88/2023-09-07_21-40-45/edit.js', 'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7182_1.0.60/2023-09-04_21-27-57/edit.js'])
+        const localComlibs = JSON.parse(localStorage.getItem('MYBRICKS_APP_THEME_COMLIBS'))
+        if (localComlibs) {
+          resolve(localComlibs)
+        } else if (isH5) {
+          resolve(['https://ali-ec.static.yximgs.com/kos/nlav11092/test/9-12/lib/libEdt.js'])
+        } else {
+          resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.2.90/2023-09-12_17-33-07/edit.js', 'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7182_1.0.64/2023-09-11_17-28-40/edit.js'])
+        }
       })
     },
     pageContentLoader() {
