@@ -236,7 +236,7 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
         } else if (isH5) {
           resolve(['https://ali-ec.static.yximgs.com/kos/nlav11092/test/091412/lib/libEdt.js'])
         } else {
-          resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.3.2/2023-09-19_21-39-53/edit.js', 'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/6807_1.0.5/2023-09-20_10-07-53/edit.js' ,'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7182_1.0.64/2023-09-11_17-28-40/edit.js'])
+          resolve(['https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.3.2/2023-09-19_21-39-53/edit.js', 'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/6807_1.0.5/2023-09-20_10-07-53/edit.js' ,'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7182_1.0.68/2023-09-20_14-29-21/edit.js'])
         }
       })
     },
