@@ -237,7 +237,7 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
           resolve(['https://ali-ec.static.yximgs.com/kos/nlav11092/test/091412/lib/libEdt.js'])
         } else {
           resolve([
-            'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.3.8/2023-09-21_20-40-01/edit.js',
+            'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.3.22/2023-09-25_20-44-45/edit.js',
             'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/6807_1.0.5/2023-09-20_10-07-53/edit.js',
             'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7182_1.0.69/2023-09-25_19-33-08/edit.js'
           ])
