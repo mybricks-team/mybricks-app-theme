@@ -250,7 +250,7 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
     editView: {
       width: 400,
       editorAppender(editConfig) {
-        return myEditors({ editConfig, designerRef, context })
+        return myEditors({ editConfig, designerRef, context }, { fileId: appData.fileId })
       },
       items(_, cate0) {
         cate0.title = '主题包'

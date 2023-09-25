@@ -1,6 +1,22 @@
+import API from '@mybricks/sdk-for-app/api'
 import ThemeEditor from './theme'
 
-export default ({ editConfig, designerRef, context }) => {
+export default ({ editConfig, designerRef, context }, { fileId }) => {
+  if (editConfig && !editConfig.upload) {
+    editConfig.upload = async (files: Array<File>): Promise<Array<string>> => {
+      const content = files[0]
+      
+      const res = await API.Upload.staticServer({
+        content,
+        folderPath: `/files/${fileId}`,
+        nohash: false,
+        fileName: content.name
+      }) as { url: string }
+
+      return [res.url]
+    }
+  }
+
   const editorsMap = {
     THEME: ThemeEditor
   }
