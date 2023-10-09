@@ -351,6 +351,7 @@ function DesignComponent () {
             }}
             defaultValue={themePanelFormData}
             options={options}
+            themeIdToThemeMap={themeIdToThemeMap}
           />
         )
       }, {width: 320, beforeEditView: true})
@@ -489,6 +490,7 @@ function ThemePanel ({
   onOk,
   options,
   defaultValue,
+  themeIdToThemeMap
 }: any) {
   const idRef = useRef<HTMLDivElement>()
   const titleRef = useRef<HTMLDivElement>()
@@ -535,19 +537,40 @@ function ThemePanel ({
       copyDom.style.right = '0px'
       copyDom.style.bottom = '0px'
       copyDom.style.position = 'relative'
-      copyDom.style.width = 'fit-content'
-      copyDom.style.height = 'fit-content'
+      copyDom.style.width = dom.offsetWidth
+      copyDom.style.height = dom.offsetHeight
       copyDom.style.zIndex = '-1'
 
-      const domParent = dom.parentElement.parentElement
+      const domParent = dom.parentElement
       domParent.appendChild(copyDom)
 
-      domToImage.toSvg(copyDom)
+      domToImage.toSvg(copyDom, {
+        filter: (dom) => {
+          const className = dom.className
+          if (typeof className === 'string' && className.startsWith('append-')) {
+            return false
+          }
+          return true
+        }
+      })
         .then((dataUrl) => {
-          domParent.removeChild(copyDom)
+          const { id, styleAry } = themeIdToThemeMap[option.value]
+          let innerText = '';
+          styleAry.forEach(({css, selector, global}) => {
+            if (selector === ':root') {
+              selector = '> *:first-child'
+            }
+            if (Array.isArray(selector)) {
+              selector.forEach((selector) => {
+                innerText = innerText + getStyleInnerText({id, css, selector, global})
+              })
+            } else {
+              innerText = innerText + getStyleInnerText({id, css, selector, global})
+            }
+          })
 
           API.Upload.toOss({
-            content: dataUrl.replace('data:image/svg+xml;charset=utf-8,', ''),
+            content: dataUrl.replace('data:image/svg+xml;charset=utf-8,', '').replace(`<foreignObject`, `<style>${innerText}</style><foreignObject`),
             folderPath: '/theme_pack_app',
             fileName: `${uuid()}_${themeId}.svg`
           }).then((value: any) => {
@@ -565,6 +588,9 @@ function ThemePanel ({
           console.error('截图失败: ', error)
           setSaveLoading(false)
           onOk(result)
+        })
+        .finally(() => {
+          domParent.removeChild(copyDom)
         })
     }
   }, [saveLoading])
@@ -820,3 +846,18 @@ function ThemePanel ({
 //     container
 //   )
 // }
+
+function getStyleInnerText ({id, css, selector, global}) {
+  return `
+    ${global ? '' : `.${id} `}${selector.replace(/\{id\}/g, `${id}`)} {
+      ${Object.keys(css).map(key => {
+        let value = css[key]
+        return `${convertCamelToHyphen(key)}: ${value}${/!important/.test(value) ? '' : '!important'};`
+      }).join('\n')}
+    }
+  `
+}
+
+function convertCamelToHyphen(str) {
+  return str.replace(/([A-Z])/g, '-$1').toLowerCase();
+}

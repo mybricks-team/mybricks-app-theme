@@ -9,7 +9,7 @@ export default ({ editConfig, designerRef, context }, { fileId }) => {
       const res = await API.Upload.staticServer({
         content,
         folderPath: `/files/${fileId}`,
-        nohash: false,
+        noHash: false,
         fileName: content.name
       }) as { url: string }
 
