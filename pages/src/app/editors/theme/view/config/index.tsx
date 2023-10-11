@@ -556,16 +556,20 @@ function ThemePanel ({
         .then((dataUrl) => {
           const { id, styleAry } = themeIdToThemeMap[option.value]
           let innerText = '';
+
+          // 这里需要将变量转换为具体的值设置，否则生成svg后样式丢失，变量没必要写入svg
+          const cssVarToValueMap = getCssVarToValueMap()
+
           styleAry.forEach(({css, selector, global}) => {
             if (selector === ':root') {
               selector = '> *:first-child'
             }
             if (Array.isArray(selector)) {
               selector.forEach((selector) => {
-                innerText = innerText + getStyleInnerText({id, css, selector, global})
+                innerText = innerText + getStyleInnerText({id, css, selector, global, cssVarToValueMap})
               })
             } else {
-              innerText = innerText + getStyleInnerText({id, css, selector, global})
+              innerText = innerText + getStyleInnerText({id, css, selector, global, cssVarToValueMap})
             }
           })
 
@@ -575,6 +579,16 @@ function ThemePanel ({
             fileName: `${uuid()}_${themeId}.svg`
           }).then((value: any) => {
             result.previewUrl = value.url
+            // function copyText(txt: string): boolean {
+            //   const input = document.createElement('input')
+            //   document.body.appendChild(input)
+            //   input.value = txt
+            //   input.select()
+            //   document.execCommand('copy')
+            //   document.body.removeChild(input)
+            //   return true
+            // }
+            // copyText(value.url)
             message.destroy(messageKey)
             setSaveLoading(false)
             onOk(result)
@@ -847,11 +861,17 @@ function ThemePanel ({
 //   )
 // }
 
-function getStyleInnerText ({id, css, selector, global}) {
+function getStyleInnerText ({id, css, selector, global, cssVarToValueMap}) {
   return `
     ${global ? '' : `.${id} `}${selector.replace(/\{id\}/g, `${id}`)} {
       ${Object.keys(css).map(key => {
         let value = css[key]
+        if (typeof value === 'string' && value.startsWith('var')) {
+          const varValue = cssVarToValueMap[value]
+          if (varValue) {
+            value = varValue
+          }
+        }
         return `${convertCamelToHyphen(key)}: ${value}${/!important/.test(value) ? '' : '!important'};`
       }).join('\n')}
     }
@@ -860,4 +880,14 @@ function getStyleInnerText ({id, css, selector, global}) {
 
 function convertCamelToHyphen(str) {
   return str.replace(/([A-Z])/g, '-$1').toLowerCase();
+}
+
+function getCssVarToValueMap () {
+  const result = {}
+  window['MYBRICKS_CSS_VARIABLE_LIST'].forEach(({options}) => {
+    options.forEach(({value, resetValue}) => {
+      result[value] = resetValue
+    })
+  })
+  return result
 }

@@ -57,7 +57,7 @@ export default function Designer({ appData }) {
     }
 
     const { name, shareType, content, icon } = param
-    API.File.save({
+    appData.save({
       userId: appData.user.id,
       fileId: appData.fileId,
       name,
@@ -164,6 +164,7 @@ export default function Designer({ appData }) {
         statusChange={(status) => {
           setOperable(status === 1)
         }}
+        compareVersion={true}
       />
     )
   }, [])
