@@ -235,7 +235,7 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
         if (localComlibs) {
           resolve(localComlibs)
         } else if (isH5) {
-          resolve(['https://ali-ec.static.yximgs.com/kos/nlav11092/test/091412/lib/libEdt.js'])
+          resolve(['https://f2.beckwai.com/udata/pkg/eshop/fangzhou/temp/0.0.11/edit.js'])
         } else {
           resolve([
             'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.3.34/2023-09-27_19-36-07/edit.js',

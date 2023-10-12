@@ -41,7 +41,9 @@ const filterFileName = [
   'sync.js',
   'sync_offline.js',
   '.github',
-  'dom-to-image.js'
+  'dom-to-image.js',
+  'mybricks-app-theme.zip',
+  'mybricks-app-theme'
 ];
 
 const files = fs.readdirSync(zipDirPath).filter(filename => {
