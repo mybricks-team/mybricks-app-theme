@@ -6,3 +6,4 @@ package-lock.json
 .vscode
 mybricks-app-theme.zip
 .DS_Store
+*.zip
