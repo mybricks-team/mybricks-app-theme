@@ -34,19 +34,17 @@ const filterFileName = [
   'package-lock.json',
   'yarn.lock',
   'pages',
-  'mybricks-app-pcspa',
   '.idea',
   '.git',
   '.vscode',
   'sync.js',
   'sync_offline.js',
   '.github',
-  'dom-to-image.js',
-  'mybricks-app-theme'
+  'dom-to-image.js'
 ];
 
 const files = fs.readdirSync(zipDirPath).filter(filename => {
-  return filterFileName.indexOf(filename) === -1;
+  return filterFileName.includes(filename) === -1 && filename.indexOf('.zip') === -1;
 });
 
 read(rootDir, files, zipDirPath);
