@@ -39,6 +39,12 @@ module.exports = merge(common, {
         target: 'http://localhost:3100',
         secure: false,
         changeOrigin: true,
+        bypass: function (req) {
+          const { url } = req;
+          if (url.startsWith("/public/") || url.startsWith("/css")) {
+            return url;
+          }
+        },
       },
     ]
   },

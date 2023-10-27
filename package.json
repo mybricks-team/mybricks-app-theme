@@ -1,6 +1,6 @@
 {
   "name": "mybricks-app-theme",
-  "version": "0.0.79",
+  "version": "0.0.80",
   "description": "主题包构建应用",
   "scripts": {
     "watch:be": "nodemon --ext js,ts --exec 'NODE_ENV=development MYBRICKS_PLATFORM_ADDRESS=https://my.mybricks.world node nodejs/index.js'",
@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.4.0",
+    "fs-extra": "^11.1.1",
     "jszip": "^3.10.1",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.3"
