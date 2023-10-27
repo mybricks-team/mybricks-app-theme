@@ -238,7 +238,7 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
           resolve(['https://f2.beckwai.com/udata/pkg/eshop/fangzhou/temp/0.0.11/edit.js'])
         } else {
           resolve([
-            'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.3.34/2023-09-27_19-36-07/edit.js',
+            'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7632_1.3.77/2023-10-27_11-56-51/edit.js',
             'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/6807_1.0.5/2023-09-20_10-07-53/edit.js',
             'https://f2.eckwai.com/kos/nlav12333/fangzhou/pub/comlibs/7182_1.0.69/2023-09-25_19-33-08/edit.js'
           ])
