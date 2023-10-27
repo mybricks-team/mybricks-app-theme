@@ -101,10 +101,11 @@ zip.generateAsync({
       headers: formData.getHeaders()
     })
     .then(res => {
+      console.log('发布应用结果：', res.data)
       if (res.data.code === 1) {
         console.log(res.data.message || '应用发布成功!');
       } else {
-        throw new Error(res.data.message || '发布应用接口错误');
+        throw new Error(res.data.msg || '发布应用接口错误');
       }
     })
     .catch(error => {
