@@ -238,7 +238,8 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
           resolve(['public/comlibs/h5.js'])
         } else {
           resolve([
-            'public/comlibs/7632.js'
+            'public/comlibs/7632.js',
+            'public/comlibs/7182.js',
           ])
         }
       })
