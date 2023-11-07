@@ -388,7 +388,7 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
       },
       theme:{
         css:[
-          'https://f2.beckwai.com/udata/pkg/eshop/fangzhou/pub/pkg/antd-4.21.6/antd.variable.min.css'
+          'public/antd-4.21.6/antd.variable.min.css'
         ],
       },
     }
