@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common'
 import axios from 'axios'
 import API from '@mybricks/sdk-for-app/api'
+import { Logger } from "@mybricks/rocker-commons";
 
 @Injectable()
 export default class Service {
   async publish({userId, fileId, json, title, req}) {
 
     const domainName = process.env.NODE_ENV === 'development' ? 'http://localhost:3100' : getRealDomain(req)
+
+    Logger.info(`1-[发布主题包] domainName: ${domainName}`)
 
     await axios({
       method: 'post',
@@ -19,12 +22,20 @@ export default class Service {
       }
     })
 
-    await API.File.publish({
-      userId,
-      fileId,
-      extName: 'theme',
-      content: JSON.stringify(json)
-    })
+    Logger.info(`2-[发布主题包] 调用物料中心 theme/create接口成功`)
+
+    try {
+      await API.File.publish({
+        userId,
+        fileId,
+        extName: 'theme',
+        content: JSON.stringify(json)
+      })
+
+      Logger.info(`3-[发布主题包] 调用API.File.publish成功`)
+    } catch (e) {
+      Logger.info(`3-[发布主题包] 调用API.File.publish失败: ${e?.message || e}`)
+    }
 
     return {
       code: 1,

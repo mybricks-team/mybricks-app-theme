@@ -7,7 +7,7 @@ import {
   UploadedFile,
   UseInterceptors
 } from '@nestjs/common'
-import { FileInterceptor } from '@nestjs/platform-express'
+import { Logger } from "@mybricks/rocker-commons";
 
 import Service from './service'
 
@@ -24,6 +24,7 @@ export default class ThemeController {
     @Body('title') title: any,
     @Req() req: any
   ) {
+    Logger.info(`0-[发布主题包] ${userId} - ${fileId} - ${title}`)
     return await this.service.publish({userId, fileId, json, title, req})
   }
 }
