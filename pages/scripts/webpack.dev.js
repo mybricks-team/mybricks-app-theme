@@ -26,17 +26,18 @@ module.exports = merge(common, {
       logging: 'warn',
     },
     proxy: [
-      // {
-      //   context: ['/api/pcpage/publish', '/api/pcpage/upload'],
-      //   // target: 'https://my.mybricks.world',
-      //   target: 'http://localhost:9002',
-      //   secure: false,
-      //   changeOrigin: true,
-      // },
+      {
+        context: ['/api/theme/publish'],
+        // target: 'https://my.mybricks.world',
+        target: 'http://localhost:9002',
+        secure: false,
+        changeOrigin: true,
+      },
       {
         context: ['/'],
         // target: 'http://testweb.manateeai.com/',
-        target: 'http://localhost:3100',
+        // target: 'http://localhost:3100',
+        target: 'https://my.mybricks.world',
         secure: false,
         changeOrigin: true,
         bypass: function (req) {

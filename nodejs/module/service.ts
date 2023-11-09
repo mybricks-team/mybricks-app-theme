@@ -7,19 +7,11 @@ import { Logger } from "@mybricks/rocker-commons";
 export default class Service {
   async publish({userId, fileId, json, title, req}) {
 
-    const domainName = process.env.NODE_ENV === 'development' ? 'http://localhost:3100' : getRealDomain(req)
-
-    Logger.info(`1-[发布主题包] domainName: ${domainName}`)
-
-    await axios({
-      method: 'post',
-      url: `${domainName}/api/material/theme/create`,
-      data: {
-        userId,
-        namespace: `_theme_${fileId}`,
-        themeConfig: json,
-        title
-      }
+    await API.Material.createTheme({
+      userId,
+      namespace: `_theme_${fileId}`,
+      themeConfig: json,
+      title
     })
 
     Logger.info(`2-[发布主题包] 调用物料中心 theme/create接口成功`)
@@ -42,29 +34,6 @@ export default class Service {
       message: null
     }
   }
-}
-
-function getRealHostName(requestHeaders) {
-  let hostName = requestHeaders.host
-  if (requestHeaders['x-forwarded-host']) {
-    hostName = requestHeaders['x-forwarded-host']
-  } else if (requestHeaders['x-host']) {
-    hostName = requestHeaders['x-host'].replace(':443', '')
-  }
-  return hostName
-}
-
-/** 有问题找zouyongsheng */
-function getRealDomain(request) {
-  let hostName = getRealHostName(request.headers);
-  const { origin } = request.headers
-  if (origin) return origin
-  // let protocol = request.headers['x-scheme'] ? 'https' : 'http'
-  /** TODO: 暂时写死 https */
-  // let protocol = 'https';
-  let protocol = request.headers?.['connection'].toLowerCase() === 'upgrade' ? 'https' : 'http'
-  let domain = `${protocol}:\/\/${hostName}`
-  return domain
 }
 
 function getNextVersion(version, max = 100) {
