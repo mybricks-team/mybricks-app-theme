@@ -236,7 +236,6 @@ function DesignComponent () {
 
   const { namespaceToAllMap, themeIdToThemeMap } = useMemo(() => {
     const { themes, ...other } = initThemeInfo(traverse(component.getAll()).reduce((f, s) => [...f, ...s], []), data.themes)
-    console.log('themes', data, themes, other)
     data.themes = themes
     setThemes(themes)
 

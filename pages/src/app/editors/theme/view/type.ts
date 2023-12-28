@@ -18,6 +18,7 @@ export interface Component {
     css?: Array<CSSFromStyle>
     data?: Record<string, any>
   }
+  style?: React.CSSProperties
   slots?: Array<Slot>
 }
 
@@ -69,7 +70,8 @@ export interface ComTemplate {
   templateId: string
   styleAry: Array<CSSFromStyle>
   data: Record<string, any>
-  isDefault: boolean
+  /** 宽高 相关样式*/
+  style: { width: number, height: number }
   namespace: string
 }
 

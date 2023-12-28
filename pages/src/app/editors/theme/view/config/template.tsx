@@ -60,6 +60,7 @@ export function initTemplateInfo (pageComponents: Array<Component>, templates: D
       css,
       data
     },
+    style,
     title,
     dom
   }) => {
@@ -87,7 +88,11 @@ export function initTemplateInfo (pageComponents: Array<Component>, templates: D
         title,
         namespace,
         styleAry: css,
-        data
+        data,
+        style: {
+          width: style.width,
+          height: style.height
+        }
       }
       namespaceToAllMap[namespace].options.push({label: title, value: id, dom})
     }
@@ -144,7 +149,7 @@ export function DesignTemplate () {
           res[temp.namespace] = false
         }
       })
-      console.log('templates', res)
+      console.log('templates', res, templates)
 
       return res
   }, [templates])
@@ -166,29 +171,17 @@ export function DesignTemplate () {
     const components = data.templates[themeIndex].components
     switch (operate) {
       case 'add':
-        components.push({...themeIdToThemeMap[templateId], title, id: uuid(), templateId, previewUrl, isDefault: components.length ? false : true})
+        components.push({...themeIdToThemeMap[templateId], title, id: uuid(), templateId, previewUrl })
         break
       case 'delete':
         const deleteIndex = components.findIndex((component) => component.id === id)
         const deleteComponent = components[deleteIndex]
         components.splice(deleteIndex, 1)
-        if (deleteComponent.isDefault && components.length) {
-          components[0].isDefault = true
-        }
         break
       case 'edit':
         const editIndex = components.findIndex((component) => component.id === id)
-        const editComponent = components[editIndex]
-        components.splice(editIndex, 1, {...themeIdToThemeMap[templateId], title, id, templateId, previewUrl, isDefault: editComponent.isDefault})
+        components.splice(editIndex, 1, {...themeIdToThemeMap[templateId], title, id, templateId, previewUrl, })
         break
-      case 'default':
-        components.forEach((component) => {
-          if (component.id === id) {
-            component.isDefault = true
-          } else {
-            component.isDefault = false
-          }
-        })
       default:
         break
     }
@@ -302,7 +295,6 @@ export function DesignTemplate () {
                   id,
                   title,
                   templateId,
-                  isDefault,
                   namespace
                 }) => {
                   return (
@@ -313,16 +305,8 @@ export function DesignTemplate () {
                         </div>
                       </div>
                       <div className={configStyle.right}>
-                        {/* 确定下，是否有默认模版的逻辑 ；对比主题中默认主题的作用；
-                            无需默认模版
-                         */}
-                        {/* <div
-                          data-mybricks-tip={isDefault ? '默认模板' : '设置为默认模板'}
-                          className={`${configStyle.action}${isDefault ? ` ${configStyle.actionIsDefault}` : ''}`}
-                          onClick={() => themeOperate({namespace, id}, 'default')}
-                        >
-                          {CircleCheckOutlined}
-                        </div> */}
+                        {/* 确定下，是否有默认模版的逻辑 ；对比主题中默认主题的作用；无需默认模版 */}
+  
                         <div
                           data-mybricks-tip='编辑'
                           className={`${configStyle.action} ${configStyle.actionEdit}`}
