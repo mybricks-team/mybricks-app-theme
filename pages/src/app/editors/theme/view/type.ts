@@ -16,6 +16,7 @@ export interface Component {
   }
   model: {
     css?: Array<CSSFromStyle>
+    data?: Record<string, any>
   }
   slots?: Array<Slot>
 }
@@ -51,6 +52,7 @@ export interface RenderProps {
   }
 }
 
+/** 组件主题 */
 export interface ComTheme {
   id: string
   title: string
@@ -60,10 +62,26 @@ export interface ComTheme {
   namespace: string
 }
 
+/** 组件模板 */
+export interface ComTemplate {
+  id: string
+  title: string
+  templateId: string
+  styleAry: Array<CSSFromStyle>
+  data: Record<string, any>
+  isDefault: boolean
+  namespace: string
+}
+
 export interface Data {
   themes: Array<{
     namespace: string
     components: Array<ComTheme>
+  }>
+  /** 模版数据 */
+  templates: Array<{
+    namespace: string
+    components: Array<ComTemplate>
   }>
   variables: Array<{
     id: string

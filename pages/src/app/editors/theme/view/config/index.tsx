@@ -5,7 +5,7 @@ import React, {
   useCallback
 } from 'react'
 import { createPortal } from 'react-dom'
-
+import { DesignTemplate } from './template'
 import { message } from 'antd'
 import domToImage from 'dom-to-image'
 import API from '@mybricks/sdk-for-app/api'
@@ -32,11 +32,16 @@ import configStyle from './index.less'
 
 const TOGGLE_OPTIONS = [
   { label: '设计规范', value: 'all' },
-  { label: '组件规范', value: 'component'}
+  { label: '组件规范', value: 'component'},
+  { label: '模板规范', value: 'template'},
 ]
 
+const openAndShow = {
+  open: true,
+  show: true
+}
 export const ConfigView = () => {
-  const [{ all, component }, setMode] = useState({
+  const [{ all, component, template }, setMode] = useState({
     all: {
       open: true,
       show: true
@@ -44,24 +49,43 @@ export const ConfigView = () => {
     component: {
       open: false,
       show: false
-    }
+    },
+    template: {
+      open: false,
+      show: false
+    },
   })
 
   const onToggleChange = useCallback((value) => {
     if (value === 'all') {
       setMode(() => {
         return {
-          all: {
-            open: true,
-            show: true
-          },
+          all: openAndShow,
           component: {
-            open: true,
+            open: component.open,
+            show: false
+          },
+          template: {
+            open: template.open,
             show: false
           }
         }
       })
-    } else {
+    } else if(value === 'component') {
+      setMode(() => {
+        return {
+          all: {
+            open: true,
+            show: false
+          },
+          component: openAndShow,
+          template: {
+            open: template.open,
+            show: false
+          }
+        }
+      })
+    }else {
       setMode(() => {
         return {
           all: {
@@ -69,9 +93,10 @@ export const ConfigView = () => {
             show: false
           },
           component: {
-            open: true,
-            show: true
-          }
+            open: component.open,
+            show: false
+          },
+          template: openAndShow
         }
       })
     }
@@ -94,6 +119,11 @@ export const ConfigView = () => {
           <DesignComponent />
         </div>
       ) : null}
+      {template.open ? (
+        <div style={{display: template.show ? 'inline' : 'none'}}>
+          <DesignTemplate />
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -104,10 +134,10 @@ export function initThemeInfo (pageComponents: Array<Component>, themes: Data['t
   const namespaceToAllMap = {}
   const namespaceMap = {}
   const themeIdToThemeMap = {}
-  const copyThemes = deepCopy(themes)
+  const copyTemplates = deepCopy(themes)
   const notInPageNamespaceMap = {}
   
-  copyThemes.forEach(({ namespace }) => {
+  copyTemplates.forEach(({ namespace }) => {
     if (!namespaceMap[namespace]) {
       namespaceMap[namespace] = true
       notInPageNamespaceMap[namespace] = true
@@ -121,7 +151,7 @@ export function initThemeInfo (pageComponents: Array<Component>, themes: Data['t
       namespace
     },
     model: {
-      css
+      css, 
     },
     title,
     dom
@@ -131,7 +161,7 @@ export function initThemeInfo (pageComponents: Array<Component>, themes: Data['t
 
     if (!namespaceMap[namespace]) {
       namespaceMap[namespace] = true
-      copyThemes.push({
+      copyTemplates.push({
         namespace,
         components: []
       })
@@ -149,7 +179,7 @@ export function initThemeInfo (pageComponents: Array<Component>, themes: Data['t
         id,
         title,
         namespace,
-        styleAry: css
+        styleAry: css,
       }
       namespaceToAllMap[namespace].options.push({label: title, value: id, dom})
     }
@@ -157,7 +187,7 @@ export function initThemeInfo (pageComponents: Array<Component>, themes: Data['t
 
   const finalThemes = []
 
-  copyThemes.forEach(({ namespace, components }) => {
+  copyTemplates.forEach(({ namespace, components }) => {
     if (!notInPageNamespaceMap[namespace]) {
       const finalComponents = []
       finalThemes.push({
@@ -188,7 +218,6 @@ export function traverse (slots) {
         if (Array.isArray(slots)) {
           return [com, ...traverse(slots).reduce((f, s) => [...f, ...s], [])]
         }
-
         return [com]
       })
     }
@@ -207,6 +236,7 @@ function DesignComponent () {
 
   const { namespaceToAllMap, themeIdToThemeMap } = useMemo(() => {
     const { themes, ...other } = initThemeInfo(traverse(component.getAll()).reduce((f, s) => [...f, ...s], []), data.themes)
+    console.log('themes', data, themes, other)
     data.themes = themes
     setThemes(themes)
 
