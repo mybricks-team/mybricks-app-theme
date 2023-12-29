@@ -129,8 +129,6 @@ export const ConfigView = () => {
 }
 
 export function initThemeInfo (pageComponents: Array<Component>, themes: Data['themes']) {
-  
-  
   const namespaceToAllMap = {}
   const namespaceMap = {}
   const themeIdToThemeMap = {}
@@ -205,6 +203,98 @@ export function initThemeInfo (pageComponents: Array<Component>, themes: Data['t
 
   return {
     themes: finalThemes,
+    namespaceToAllMap,
+    themeIdToThemeMap
+  }
+}
+
+export function initTemplateInfo (pageComponents: Array<Component>, templates: Data['templates']) {
+  const namespaceToAllMap = {}
+  const namespaceMap = {}
+  const themeIdToThemeMap = {}
+  const copyTemplates = deepCopy(templates)
+  const notInPageNamespaceMap = {}
+  
+  copyTemplates.forEach(({ namespace }) => {
+    if (!namespaceMap[namespace]) {
+      namespaceMap[namespace] = true
+      notInPageNamespaceMap[namespace] = true
+    }
+  })
+
+  pageComponents.forEach(({
+    id,
+    def: {
+      title: defTitle,
+      namespace,
+      version
+    },
+    model: {
+      css,
+      data
+    },
+    style,
+    title,
+    dom
+  }) => {
+
+    Reflect.deleteProperty(notInPageNamespaceMap, namespace)
+
+    if (!namespaceMap[namespace]) {
+      namespaceMap[namespace] = true
+      copyTemplates.push({
+        namespace,
+        components: []
+      })
+    }
+
+    if (!namespaceToAllMap[namespace]) {
+      namespaceToAllMap[namespace] = {
+        title: defTitle,
+        options: [],
+        version
+      }
+    }
+
+    if (css || data) {
+      themeIdToThemeMap[id] = {
+        id,
+        title,
+        namespace,
+        styleAry: css,
+        data,
+        style: {
+          width: style.width,
+          height: style.height
+        }
+      }
+      namespaceToAllMap[namespace].options.push({label: title, value: id, dom})
+    }
+  })
+
+  const finalThemes = []
+
+  copyTemplates.forEach(({ namespace, components }) => {
+    if (!notInPageNamespaceMap[namespace]) {
+      const finalComponents = []
+      finalThemes.push({
+        namespace,
+        version: namespaceToAllMap[namespace].version,
+        /** 组件com.json中的标题 */
+        comTitle: namespaceToAllMap[namespace].title,
+        components: finalComponents
+      })
+      components.forEach((component) => {
+        const theme = themeIdToThemeMap[component.templateId]
+        if (theme) {
+          finalComponents.push({ ...component, styleAry: theme.styleAry })
+        }
+      })
+    }
+  })
+
+  return {
+    templates: finalThemes,
     namespaceToAllMap,
     themeIdToThemeMap
   }

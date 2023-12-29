@@ -15,7 +15,7 @@ import versionPlugin from 'mybricks-plugin-version'
 import { Locker, Toolbar } from '@mybricks/sdk-for-app/ui'
 
 import myEditors from './editors'
-import { traverse, initThemeInfo } from './editors/theme/view/config'
+import { traverse, initThemeInfo, initTemplateInfo } from './editors/theme/view/config'
 
 import css from './designer.less'
 
@@ -82,8 +82,10 @@ export default function Designer({ appData }) {
   const getSaveJson = useCallback(() => {
     const json = designerRef.current.dump()
     const { themes } = initThemeInfo(traverse(designerRef.current.components.getAll()).reduce((f, s) => [...f, ...s], []), context.theme.themes)
+    const { templates } = initTemplateInfo(traverse(designerRef.current.components.getAll()).reduce((f, s) => [...f, ...s], []), context.theme.templates || [])
     
     context.theme.themes = themes
+    context.theme.templates = templates
     json.theme = context.theme
     json.componentType = context.componentType
 
