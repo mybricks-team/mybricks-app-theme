@@ -13,7 +13,6 @@ import API from '@mybricks/sdk-for-app/api'
 // import toolsPlugin from '@mybricks/plugin-tools'
 import versionPlugin from 'mybricks-plugin-version'
 import { Locker, Toolbar } from '@mybricks/sdk-for-app/ui'
-import { use as useTheme } from '/Users/wufan12/eccom/plugin-theme/src';
 
 import myEditors from './editors'
 import { traverse, initThemeInfo } from './editors/theme/view/config'
@@ -221,7 +220,6 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
 
   return {
     plugins: [
-      useTheme({ sdk: appData }),
       versionPlugin({
         user: appData.user,
         file: appData.fileContent || {}

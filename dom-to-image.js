@@ -574,6 +574,13 @@
         function height(node) {
             var topBorder = px(node, 'border-top-width');
             var bottomBorder = px(node, 'border-bottom-width');
+            // TODO: 高度计算不正确，pc通用组件库的滑动输入组件
+            // console.log("node高度: ", node.scrollHeight + topBorder + bottomBorder, node)
+            // console.log("node.scrollHeight: ", node.scrollHeight)
+            // console.log("topBorder: ", topBorder)
+            // console.log("bottomBorder: ", bottomBorder)
+            // console.log("height: ", node.height, node.style.height)
+            // return '100%'
             return node.scrollHeight + topBorder + bottomBorder;
         }
 
