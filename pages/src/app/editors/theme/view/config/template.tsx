@@ -54,7 +54,8 @@ export function initTemplateInfo (pageComponents: Array<Component>, templates: D
     id,
     def: {
       title: defTitle,
-      namespace
+      namespace,
+      version
     },
     model: {
       css,
@@ -78,7 +79,8 @@ export function initTemplateInfo (pageComponents: Array<Component>, templates: D
     if (!namespaceToAllMap[namespace]) {
       namespaceToAllMap[namespace] = {
         title: defTitle,
-        options: []
+        options: [],
+        version
       }
     }
 
@@ -105,6 +107,9 @@ export function initTemplateInfo (pageComponents: Array<Component>, templates: D
       const finalComponents = []
       finalThemes.push({
         namespace,
+        version: namespaceToAllMap[namespace].version,
+        /** 组件com.json中的标题 */
+        comTitle: namespaceToAllMap[namespace].title,
         components: finalComponents
       })
       components.forEach((component) => {
@@ -139,20 +144,19 @@ export function DesignTemplate () {
     return other
   }, [])
 
-  /** 组件模版可添加状态，下面有多余1条模版，就不可添加; key 为namespace */
-  const mapCompTemplateCanAddStatus = useMemo(() => {
-      const res = {}
-      templates.forEach(temp => {
-        if(temp.components.length >= maxCompTemplate) {
-          res[temp.namespace] = true
-        } else {
-          res[temp.namespace] = false
-        }
-      })
-      console.log('templates', res, templates)
-
-      return res
-  }, [templates])
+  /** 组件模版可添加状态，下面有多余**条模版，就不可添加; key 为namespace */
+  /** 不需要限制 */
+  // const mapCompTemplateCanAddStatus = useMemo(() => {
+  //     const res = {}
+  //     templates.forEach(temp => {
+  //       if(temp.components.length >= maxCompTemplate) {
+  //         res[temp.namespace] = true
+  //       } else {
+  //         res[temp.namespace] = false
+  //       }
+  //     })
+  //     return res
+  // }, [templates])
 
   const themeOperate = useCallback(({
     id,
@@ -276,13 +280,9 @@ export function DesignTemplate () {
                   </div>
                 </div>
                 <div
-                  className={`${configStyle.icon}${!editId && namespace === editNamespace ? ` ${configStyle.iconActive}` : ''} ${mapCompTemplateCanAddStatus[namespace] ? ` ${configStyle.iconDisabled}` : ''}`}
+                  className={`${configStyle.icon}${!editId && namespace === editNamespace ? ` ${configStyle.iconActive}` : ''} `}
                   data-mybricks-tip={`{content:'新建模板',position:'left'}`}
                   onClick={(e) => {
-                    if(mapCompTemplateCanAddStatus[namespace] === true) {
-                      e.stopPropagation()
-                      return
-                    }
                     actionOperate(e, { namespace }, 'add')
                   }}
                 >

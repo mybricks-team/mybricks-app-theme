@@ -83,6 +83,10 @@ export interface Data {
   /** 模版数据 */
   templates: Array<{
     namespace: string
+    /** 组件标题，对应com.json中的title */
+    comTitle: string
+    /** 组件版本 */
+    version: string
     components: Array<ComTemplate>
   }>
   variables: Array<{

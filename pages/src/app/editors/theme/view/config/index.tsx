@@ -33,7 +33,7 @@ import configStyle from './index.less'
 const TOGGLE_OPTIONS = [
   { label: '设计规范', value: 'all' },
   { label: '组件规范', value: 'component'},
-  { label: '模板规范', value: 'template'},
+  { label: '模板', value: 'template'},
 ]
 
 const openAndShow = {
