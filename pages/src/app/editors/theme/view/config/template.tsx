@@ -422,7 +422,7 @@ function ThemePanel ({
           // 这里需要将变量转换为具体的值设置，否则生成svg后样式丢失，变量没必要写入svg
           const cssVarToValueMap = getCssVarToValueMap()
 
-          styleAry.forEach(({css, selector, global}) => {
+          styleAry?.forEach(({css, selector, global}) => {
             if (selector === ':root') {
               selector = '> *:first-child'
             }
