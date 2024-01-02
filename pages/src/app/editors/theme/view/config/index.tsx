@@ -233,6 +233,7 @@ export function initTemplateInfo (pageComponents: Array<Component>, templates: D
       css,
       data
     },
+    slots,
     style,
     title,
     dom
@@ -266,7 +267,8 @@ export function initTemplateInfo (pageComponents: Array<Component>, templates: D
         style: {
           width: style.width,
           height: style.height
-        }
+        },
+        slots
       }
       namespaceToAllMap[namespace].options.push({label: title, value: id, dom})
     }
