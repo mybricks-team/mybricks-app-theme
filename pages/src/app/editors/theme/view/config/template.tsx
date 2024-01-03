@@ -150,7 +150,7 @@ export function DesignTemplate () {
       const { id, namespace } = templatePanelFormData
       const { title, options } = namespaceToAllMap[namespace]
 
-      popView(`${id ? '编辑' : `新建"${title}"`}模板`, ({ close }) => {
+      popView(`${id ? '编辑' : `新建"${title}"`}模板组件`, ({ close }) => {
         return (
           <ThemePanel
             onOk={(value) => {
@@ -189,7 +189,7 @@ export function DesignTemplate () {
                 </div>
                 <div
                   className={`${configStyle.icon}${!editId && namespace === editNamespace ? ` ${configStyle.iconActive}` : ''} `}
-                  data-mybricks-tip={`{content:'新建模板',position:'left'}`}
+                  data-mybricks-tip={`{content:'新建模板组件',position:'left'}`}
                   onClick={(e) => {
                     actionOperate(e, { namespace }, 'add')
                   }}
@@ -234,7 +234,7 @@ export function DesignTemplate () {
                   )
                 }) : (
                   <div className={configStyle.empty}>
-                    无定制模板，请添加
+                    无定制模板组件，请添加
                   </div>
                 )}
               </div>
@@ -264,10 +264,16 @@ function ThemePanel ({
 }: any) {
   const idRef = useRef<HTMLDivElement>()
   const titleRef = useRef<HTMLDivElement>()
-  const [formData] = useState({ ...defaultValue })
+  const [formData, setFormData] = useState({ ...defaultValue })
   const [saveLoading, setSaveLoading] = useState(false)
+  const optionValueMap = useMemo(() => {
+    return options.reduce((pre, cur) => {
+      pre[cur.value] = cur
+      return pre
+    }, {})
+  }, [])
 
-  const validate = useCallback(() => {
+  function validate () {
     const title = formData.title?.trim()
     const templateId = formData.templateId
     let result: any = {
@@ -286,9 +292,9 @@ function ThemePanel ({
     }
 
     return result
-  }, [])
+  }
 
-  const onSaveClick = useCallback(async () => {
+  async function onSaveClick () {
     if (saveLoading) {
       return
     }
@@ -377,22 +383,29 @@ function ThemePanel ({
           domParent.removeChild(copyDom)
         })
     }
-  }, [saveLoading])
+  }
 
-  const onTitleInputChange = useCallback((e) => {
+  function onTitleInputChange (e) {
     const value = e.target.value.trim()
-    formData.title = value
+    setFormData({
+      ...formData,
+      title: value,
+    })
     if (!value.length) {
       titleRef.current.classList.add(configStyle.error)
     } else {
       titleRef.current.classList.remove(configStyle.error)
     }
-  }, [])
+  }
 
-  const onSelectChange = useCallback((value) => {
-    formData.templateId = value
+  function onSelectChange (value) {
+    setFormData({
+      ...formData,
+      templateId: value,
+      title: optionValueMap[value].label
+    })
     idRef.current.classList.remove(configStyle.error)
-  }, [])
+  }
 
   return (
     <div className={configStyle.popView}>
@@ -407,11 +420,11 @@ function ThemePanel ({
           <div
             ref={titleRef}
             className={`${configStyle.editor} ${configStyle.textEdt}`}
-            data-err={'请输入模板名称'}
+            data-err={'请输入组件名称'}
           >
             <input
               type={'text'}
-              placeholder={'请输入模板名称'}
+              placeholder={'请输入组件名称'}
               defaultValue={formData.title}
               onChange={onTitleInputChange}
             />
@@ -424,11 +437,11 @@ function ThemePanel ({
           <div
             ref={idRef}
             className={`${configStyle.editor} ${configStyle.textEdt}`}
-            data-err={'请选择模板配置'}
+            data-err={'请选择组件'}
           >
             <Select
               defaultValue={formData.templateId}
-              placeholder='请选择模板'
+              placeholder='请选择组件'
               options={options}
               onChange={onSelectChange}
             />

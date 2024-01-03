@@ -33,7 +33,7 @@ import configStyle from './index.less'
 const TOGGLE_OPTIONS = [
   { label: '设计规范', value: 'all' },
   { label: '组件规范', value: 'component'},
-  { label: '模板', value: 'template'},
+  { label: '模板组件', value: 'template'},
 ]
 
 const openAndShow = {
@@ -264,11 +264,13 @@ export function initTemplateInfo (pageComponents: Array<Component>, templates: D
         namespace,
         styleAry: css,
         data,
-        style: {
-          width: style.width,
-          height: style.height
-        },
-        slots
+        style,
+        slots: slots?.map((slot) => {
+          return {
+            ...slot,
+            comAry: []
+          }
+        })
       }
       namespaceToAllMap[namespace].options.push({label: title, value: id, dom})
     }
@@ -289,7 +291,7 @@ export function initTemplateInfo (pageComponents: Array<Component>, templates: D
       components.forEach((component) => {
         const theme = themeIdToThemeMap[component.templateId]
         if (theme) {
-          finalComponents.push({ ...component, styleAry: theme.styleAry })
+          finalComponents.push({ ...component, data: theme.data, slots: theme.slots, style: theme.style, styleAry: theme.styleAry })
         }
       })
     }
@@ -463,7 +465,7 @@ function DesignComponent () {
       const { id, namespace } = themePanelFormData
       const { title, options } = namespaceToAllMap[namespace]
 
-      popView(`${id ? '编辑' : `新建"${title}"`}主题`, ({ close }) => {
+      popView(`${id ? '编辑' : `新建"${title}"`}组件规范`, ({ close }) => {
         return (
           <ThemePanel
             onOk={(value) => {
@@ -526,7 +528,7 @@ function DesignComponent () {
                 </div>
                 <div
                   className={`${configStyle.icon}${!editId && namespace === editNamespace ? ` ${configStyle.iconActive}` : ''}`}
-                  data-mybricks-tip={`{content:'新建主题',position:'left'}`}
+                  data-mybricks-tip={`{content:'新建组件规范',position:'left'}`}
                   onClick={(e) => actionOperate(e, { namespace }, 'add')}
                 >
                   {PlusOutlined}
@@ -550,7 +552,7 @@ function DesignComponent () {
                       </div>
                       <div className={configStyle.right}>
                         <div
-                          data-mybricks-tip={isDefault ? '默认主题' : '设置为默认主题'}
+                          data-mybricks-tip={isDefault ? '默认组件规范' : '设置为默认组件规范'}
                           className={`${configStyle.action}${isDefault ? ` ${configStyle.actionIsDefault}` : ''}`}
                           onClick={() => themeOperate({namespace, id}, 'default')}
                         >
@@ -607,7 +609,7 @@ function DesignComponent () {
   )
 }
 
-function ThemePanel ({
+export function ThemePanel ({
   onOk,
   options,
   defaultValue,
@@ -615,10 +617,16 @@ function ThemePanel ({
 }: any) {
   const idRef = useRef<HTMLDivElement>()
   const titleRef = useRef<HTMLDivElement>()
-  const [formData] = useState({ ...defaultValue })
+  const [formData, setFormData] = useState({ ...defaultValue })
   const [saveLoading, setSaveLoading] = useState(false)
+  const optionValueMap = useMemo(() => {
+    return options.reduce((pre, cur) => {
+      pre[cur.value] = cur
+      return pre
+    }, {})
+  }, [])
 
-  const validate = useCallback(() => {
+  function validate () {
     const title = formData.title?.trim()
     const themeId = formData.themeId
     let result: any = {
@@ -637,9 +645,9 @@ function ThemePanel ({
     }
 
     return result
-  }, [])
+  }
 
-  const onSaveClick = useCallback(async () => {
+  async function onSaveClick() {
     if (saveLoading) {
       return
     }
@@ -728,22 +736,29 @@ function ThemePanel ({
           domParent.removeChild(copyDom)
         })
     }
-  }, [saveLoading])
+  }
 
-  const onTitleInputChange = useCallback((e) => {
+  function onTitleInputChange (e) {
     const value = e.target.value.trim()
-    formData.title = value
+    setFormData({
+      ...formData,
+      title: value,
+    })
     if (!value.length) {
       titleRef.current.classList.add(configStyle.error)
     } else {
       titleRef.current.classList.remove(configStyle.error)
     }
-  }, [])
+  }
 
-  const onSelectChange = useCallback((value) => {
-    formData.themeId = value
+  function onSelectChange (value) {
+    setFormData({
+      ...formData,
+      themeId: value,
+      title: optionValueMap[value].label
+    })
     idRef.current.classList.remove(configStyle.error)
-  }, [])
+  }
 
   return (
     <div className={configStyle.popView}>
@@ -758,28 +773,28 @@ function ThemePanel ({
           <div
             ref={titleRef}
             className={`${configStyle.editor} ${configStyle.textEdt}`}
-            data-err={'请输入主题名称'}
+            data-err={'请输入组件名称'}
           >
             <input
               type={'text'}
-              placeholder={'请输入主题名称'}
-              defaultValue={formData.title}
+              placeholder={'请输入组件名称'}
+              value={formData.title}
               onChange={onTitleInputChange}
             />
           </div>
         </div>
         <div className={configStyle.formItem}>
           <label>
-            <i>*</i>配置
+            <i>*</i>组件
           </label>
           <div
             ref={idRef}
             className={`${configStyle.editor} ${configStyle.textEdt}`}
-            data-err={'请选择主题配置'}
+            data-err={'请选择组件'}
           >
             <Select
               defaultValue={formData.themeId}
-              placeholder='请选择主题'
+              placeholder='请选择组件'
               options={options}
               onChange={onSelectChange}
             />
@@ -789,198 +804,6 @@ function ThemePanel ({
     </div>
   )
 }
-
-
-// function ThemePanel ({
-//   title,
-//   onOk,
-//   onCancel,
-//   style,
-//   options,
-//   defaultValue,
-//   container
-// }: any) {
-//   const idRef = useRef<HTMLDivElement>()
-//   const titleRef = useRef<HTMLDivElement>()
-//   const [formData] = useState({ ...defaultValue })
-//   const [saveLoading, setSaveLoading] = useState(false)
-
-//   const validate = useCallback(() => {
-//     const title = formData.title?.trim()
-//     const themeId = formData.themeId
-//     let result: any = {
-//       id: formData.id,
-//       namespace: formData.namespace,
-//       themeId,
-//       title
-//     }
-//     if (!title) {
-//       result = false
-//       titleRef.current.classList.add(configStyle.error)
-//     }
-//     if (!themeId) {
-//       result = false
-//       idRef.current.classList.add(configStyle.error)
-//     }
-
-//     return result
-//   }, [])
-
-//   const onSaveClick = useCallback(async () => {
-//     if (saveLoading) {
-//       return
-//     }
-//     const result = validate()
-//     if (result) {
-//       const messageKey = 'upload' + uuid()
-//       message.loading({ content: '预览图生成中...', key: messageKey });
-//       setSaveLoading(true)
-//       const { themeId } = result
-//       const option = options.find((option) => option.value === themeId)
-//       const dom = option.dom
-//       // console.time('克隆耗时: ')
-//       const copyDom = dom.cloneNode(true)
-
-//       copyDom.style.top = '0px'
-//       copyDom.style.left = '0px'
-//       copyDom.style.right = '0px'
-//       copyDom.style.bottom = '0px'
-//       copyDom.style.position = 'relative'
-//       copyDom.style.width = 'fit-content'
-//       copyDom.style.height = 'fit-content'
-//       copyDom.style.zIndex = '-1'
-
-//       const domParent = dom.parentElement.parentElement
-//       domParent.appendChild(copyDom)
-//       // console.timeEnd('克隆耗时: ')
-
-//       // console.time('截图耗时: ')
-//       domToImage.toSvg(copyDom)
-//         .then((dataUrl) => {
-//           // console.timeEnd('截图耗时: ')
-//           domParent.removeChild(copyDom)
-
-//           API.Upload.toOss({
-//             content: dataUrl.replace('data:image/svg+xml;charset=utf-8,', ''),
-//             folderPath: '/theme_pack_app',
-//             fileName: `${uuid()}_${themeId}.svg`
-//           }).then((value: any) => {
-//             result.previewUrl = value.url
-//             message.destroy(messageKey)
-//             setSaveLoading(false)
-//             onOk(result)
-//           }).catch((error) => {
-//             console.error('预览图上传失败: ', error)
-//             setSaveLoading(false)
-//             onOk(result)
-//           })
-//         })
-//         .catch((error) => {
-//           console.error('截图失败: ', error)
-//           setSaveLoading(false)
-//           onOk(result)
-//         })
-
-//       // domToImage.toPng(option.dom.firstChild)
-//       //   .then((dataUrl) => {
-//       //     const binaryString = window.atob(dataUrl.split(',')[1])
-//       //     const length = binaryString.length
-//       //     const binaryArray = new Uint8Array(length)
-
-//       //     for (let i = 0; i < length; i++) {
-//       //       binaryArray[i] = binaryString.charCodeAt(i)
-//       //     }
-//       //     API.Upload.toOss({
-//       //       // @ts-ignore
-//       //       content: binaryArray,
-//       //       folderPath: '/theme_pack_app',
-//       //       fileName: `${uuid()}_${themeId}.png`
-//       //     }).then((value: any) => {
-//       //       result.previewUrl = value.url
-//       //       message.destroy(messageKey)
-//       //       setSaveLoading(false)
-//       //       onOk(result)
-//       //     }).catch((error) => {
-//       //       console.error('预览图上传失败: ', error)
-//       //       setSaveLoading(false)
-//       //       onOk(result)
-//       //     })
-//       //   })
-//       //   .catch((error) => {
-//       //     console.error('截图失败: ', error)
-//       //     setSaveLoading(false)
-//       //     onOk(result)
-//       //   })
-//     }
-//   }, [saveLoading])
-
-//   const onTitleInputChange = useCallback((e) => {
-//     const value = e.target.value.trim()
-//     formData.title = value
-//     if (!value.length) {
-//       titleRef.current.classList.add(configStyle.error)
-//     } else {
-//       titleRef.current.classList.remove(configStyle.error)
-//     }
-//   }, [])
-
-//   const onSelectChange = useCallback((value) => {
-//     formData.themeId = value
-//     idRef.current.classList.remove(configStyle.error)
-//   }, [])
-
-//   return createPortal(
-//     <div className={configStyle.themePanel} style={style} key={formData}>
-//       <div className={configStyle.header}>
-//         <div>
-//           {title}
-//         </div>
-//         <div>
-//           <Button onClick={onCancel}>关闭</Button>
-//           <Button type='primary' onClick={onSaveClick}>保存</Button>
-//         </div>
-//       </div>
-//       <div className={configStyle.form}>
-//         <div className={configStyle.formItem}>
-//           <label>
-//             <i>*</i>名称
-//           </label>
-//           <div
-//             ref={titleRef}
-//             className={`${configStyle.editor} ${configStyle.textEdt}`}
-//             data-err={'请输入主题名称'}
-//           >
-//             <input
-//               type={'text'}
-//               placeholder={'请输入主题名称'}
-//               defaultValue={formData.title}
-//               onChange={onTitleInputChange}
-//             />
-//           </div>
-//         </div>
-//         <div className={configStyle.formItem}>
-//           <label>
-//             <i>*</i>配置
-//           </label>
-//           <div
-//             ref={idRef}
-//             className={`${configStyle.editor} ${configStyle.textEdt}`}
-//             data-err={'请选择主题配置'}
-//           >
-//             <Select
-//               defaultValue={formData.themeId}
-//               placeholder='请选择主题'
-//               options={options}
-//               onChange={onSelectChange}
-//             />
-//           </div>
-//         </div>
-//       </div>
-//     </div>,
-//     // document.body
-//     container
-//   )
-// }
 
 function getStyleInnerText ({id, css, selector, global, cssVarToValueMap}) {
   return `
