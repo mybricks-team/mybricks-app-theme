@@ -402,7 +402,7 @@ function ThemePanel ({
     setFormData({
       ...formData,
       templateId: value,
-      title: optionValueMap[value].label
+      title: formData.title || optionValueMap[value].label
     })
     idRef.current.classList.remove(configStyle.error)
   }

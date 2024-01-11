@@ -752,10 +752,12 @@ export function ThemePanel ({
   }
 
   function onSelectChange (value) {
-    setFormData({
-      ...formData,
-      themeId: value,
-      title: optionValueMap[value].label
+    setFormData((formData) => {
+      return {
+        ...formData,
+        themeId: value,
+        title: formData.title || optionValueMap[value].label
+      }
     })
     idRef.current.classList.remove(configStyle.error)
   }
