@@ -534,9 +534,40 @@ export default function ThemeEditor ({ editConfig, designer, context }) {
       GET_DEFAULT_VARIABLES({ themes })
     }
 
+    const setCSSVar = themes.setCSSVar
+    const cssVar = []
+    const cssVarMap = {}
+    let count = 0
+    themes.setCSSVar = (id, value) => {
+      const css = {id, value}
+      cssVar[count++] = css
+      cssVarMap[id] = css
+      return setCSSVar(id, value)
+    }
+
     SET_MYBRICKS_CSS_VARIABLE_LIST(themeContext)
 
     SET_DEPRECATED_CSS_VARIABLE({ themes })
+
+    let styleThemes = document.getElementById("__themes__")
+    if (!styleThemes) {
+      styleThemes = document.createElement("style")
+      styleThemes.setAttribute("id", "__themes__")
+      document.body.appendChild(styleThemes)
+    }
+    styleThemes.textContent = `\n:root {\n ${cssVar.map(({id, value}) => `${id}:${value};`).join("\n")}\n}`
+
+    themes.setCSSVar = (id, value) => {
+      if (!cssVarMap[id]) {
+        const css = {id, value}
+        cssVar[count++] = css
+        cssVarMap[id] = css
+      } else {
+        cssVarMap[id].value = value
+      }
+      styleThemes.textContent = `\n:root {\n ${cssVar.map(({id, value}) => `${id}:${value};`).join("\n")}\n}`
+      return setCSSVar(id, value)
+    }
   }, [])
 
   return {
