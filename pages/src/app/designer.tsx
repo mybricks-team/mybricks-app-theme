@@ -190,7 +190,11 @@ export default function Designer({ appData }) {
           onImport={(value) => {
             try {
               const { content, theme } = JSON.parse(value)
-              context.theme = theme
+              context.theme = theme || {
+                themes: [],
+                variables: [],
+                templates: []
+              }
               designerRef.current.loadContent(content)
             } catch (e) {
               message.error(e)
