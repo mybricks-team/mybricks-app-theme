@@ -18,6 +18,9 @@ import myEditors from './editors'
 import { traverse, initThemeInfo, initTemplateInfo } from './editors/theme/view/config'
 
 import css from './designer.less'
+import notePlugin from '@mybricks/plugin-note'
+import upload from './utils/upload'
+import searchUser from './utils/searchUser'
 
 const SPADesigner = window.mybricks.SPADesigner
 // const LOCAL_DATA_KEY = '"--mybricks--'
@@ -229,6 +232,44 @@ function spaDesignerConfig ({ appData, designerRef, context }) {
       versionPlugin({
         user: appData.user,
         file: appData.fileContent || {}
+      }),
+      notePlugin({
+        user: appData.user,
+        onUpload: async (file: File) => {
+          return new Promise(async (resolve, reject) => {
+            try {
+              const res = await upload(`api/theme/upload`, file);
+              console.log(res, 'onUpload')
+              resolve(res);
+            } catch (e) {
+              message.error('上传图片失败!');
+              reject(e);
+            }
+          })
+        },
+        onSearchUser: (keyword: string) => {
+          return new Promise(async (resolve, reject) => {
+            try {
+              const res = await searchUser(`api/theme/searchUser`, {
+                keyword
+              });
+              const formatRes = (res || []).map(item => {
+                const { email, id, name, avatar } = item;
+                return {
+                  name: name ? `${name}(${email})` : email,
+                  id,
+                  username: email,
+                  orgDisplayName: '',
+                  thumbnailAvatarUrl: avatar
+                }
+              })
+              resolve(formatRes);
+            } catch (e) {
+              message.error('搜索用户失败!');
+              reject('搜索用户失败!');
+            }
+          })
+        }
       }),
       // toolsPlugin(),
     ],

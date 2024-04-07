@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import axios from 'axios'
 import API from '@mybricks/sdk-for-app/api'
 import { Logger } from "@mybricks/rocker-commons";
+import { searchUser } from "./seachUser";
 
 @Injectable()
 export default class Service {
@@ -33,6 +34,10 @@ export default class Service {
       code: 1,
       message: null
     }
+  }
+
+  async searchUser(params: { keyword: string }) {
+    return await searchUser(params);
   }
 }
 
