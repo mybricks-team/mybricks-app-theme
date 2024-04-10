@@ -21,6 +21,7 @@ import css from './designer.less'
 import notePlugin from '@mybricks/plugin-note'
 import upload from './utils/upload'
 import searchUser from './utils/searchUser'
+import { createFromIconfontCN } from '@ant-design/icons'
 
 const SPADesigner = window.mybricks.SPADesigner
 // const LOCAL_DATA_KEY = '"--mybricks--'
@@ -35,7 +36,8 @@ export default function Designer({ appData }) {
       getAll: () => any
     }
   }>()
-  const [operable, setOperable] = useState(false)
+  const [operable, setOperable] = useState(false);
+  const operableRef = useRef(operable);
   const [beforeunload, setBeforeunload] = useState(false)
   const [saveTip, setSaveTip] = useState('')
   const [saveLoading, setSaveLoading] = useState(false)
@@ -54,7 +56,7 @@ export default function Designer({ appData }) {
 
   const save = useCallback((param: { name?; shareType?; content?; icon?},
     skipMessage?: boolean) => {
-    if (!operable) {
+    if (!operableRef.current) {
       message.warn('请先点击右上角个人头像上锁获取页面编辑权限')
       return
     }
@@ -168,6 +170,7 @@ export default function Designer({ appData }) {
       <Locker
         statusChange={(status) => {
           setOperable(status === 1)
+          operableRef.current = status === 1
         }}
         compareVersion={true}
       />
@@ -177,6 +180,7 @@ export default function Designer({ appData }) {
   return (
     <div className={`${css.view} fangzhou-theme`}>
       <Toolbar title={appData.fileContent.name} updateInfo={<Toolbar.LastUpdate content={saveTip} />}>
+        <Toolbar.Tips/>
         {RenderLocker}
         <Toolbar.Save
           disabled={!operable}
@@ -215,7 +219,12 @@ export default function Designer({ appData }) {
       <div className={css.designer}>
         <SPADesigner
           ref={designerRef}
-          config={spaDesignerConfig({ appData, designerRef, context })}
+          config={spaDesignerConfig({
+            appData, 
+            onSaveClick,
+            designerRef, 
+            context 
+          })}
           onEdit={onEdit}
         />
       </div>
@@ -223,11 +232,14 @@ export default function Designer({ appData }) {
   )
 }
 
-function spaDesignerConfig ({ appData, designerRef, context }) {
+function spaDesignerConfig ({ appData, onSaveClick, designerRef, context }) {
   const content = appData.fileContent?.content || {}
   const isH5 = content.componentType === 'H5'
 
   return {
+    shortcuts: {
+      'ctrl+s': [onSaveClick],
+    },
     plugins: [
       versionPlugin({
         user: appData.user,
