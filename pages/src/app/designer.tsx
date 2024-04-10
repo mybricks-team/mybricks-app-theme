@@ -54,6 +54,19 @@ export default function Designer({ appData }) {
     }
   }, [])
 
+  const [ctx, setCtx] = useState(() => {
+    return {
+      fontJS: appData.fileContent?.content?.fontJS
+    }
+  })
+
+  //页面刷新的时候，添加fontJS资源
+  useEffect(() => {
+    createFromIconfontCN({
+      scriptUrl: ctx.fontJS, // 在 iconfont.cn 上生成
+    })
+  }, [ctx.fontJS])
+
   const save = useCallback((param: { name?; shareType?; content?; icon?},
     skipMessage?: boolean) => {
     if (!operableRef.current) {
@@ -93,6 +106,7 @@ export default function Designer({ appData }) {
     context.theme.templates = templates
     json.theme = context.theme
     json.componentType = context.componentType
+    json.fontJS = ctx.fontJS
 
     return json
   }, [])
@@ -220,6 +234,7 @@ export default function Designer({ appData }) {
         <SPADesigner
           ref={designerRef}
           config={spaDesignerConfig({
+            ctx,
             appData, 
             onSaveClick,
             designerRef, 
@@ -232,7 +247,7 @@ export default function Designer({ appData }) {
   )
 }
 
-function spaDesignerConfig ({ appData, onSaveClick, designerRef, context }) {
+function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context }) {
   const content = appData.fileContent?.content || {}
   const isH5 = content.componentType === 'H5'
 
@@ -312,6 +327,7 @@ function spaDesignerConfig ({ appData, onSaveClick, designerRef, context }) {
     editView: {
       width: 400,
       editorAppender(editConfig) {
+        editConfig.fontJS = ctx.fontJS
         return myEditors({ editConfig, designerRef, context }, { fileId: appData.fileId })
       },
       items(_, cate0) {
@@ -320,6 +336,26 @@ function spaDesignerConfig ({ appData, onSaveClick, designerRef, context }) {
           {
             title: '主题包配置',
             type: 'Theme'
+          },
+          {
+            items: [
+              {
+                title: 'iconfont js链接',
+                type: 'Text',
+                description: '设置iconfont js链接',
+                value: {
+                  get() {
+                    return ctx.fontJS
+                  },
+                  set(context, v: string) {
+                    ctx.fontJS = v
+                    createFromIconfontCN({
+                      scriptUrl: v, // 在 iconfont.cn 上生成
+                    })
+                  },
+                },
+              },
+            ],
           },
         ]
       },
