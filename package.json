@@ -1,6 +1,6 @@
 {
   "name": "mybricks-app-theme",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "主题包构建应用",
   "scripts": {
     "watch:be": "nodemon --ext js,ts --exec 'NODE_ENV=development MYBRICKS_PLATFORM_ADDRESS=https://my.mybricks.world node nodejs/index.js'",
@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@mybricks/rocker-dao": "^0.0.6",
-    "@mybricks/sdk-for-app": "^1.0.35",
+    "@mybricks/sdk-for-app": "^1.0.36",
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
     "@nestjs/platform-express": "^8.0.0",
