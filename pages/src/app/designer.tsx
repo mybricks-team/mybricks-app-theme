@@ -23,6 +23,8 @@ import upload from './utils/upload'
 import searchUser from './utils/searchUser'
 import { createFromIconfontCN } from '@ant-design/icons'
 
+import { DESIGN_MATERIAL_EDITOR_OPTIONS, mergeEditorOptions, PURE_INTERNET_EDITOR_OPTIONS } from "./editor-options";
+
 const SPADesigner = window.mybricks.SPADesigner
 // const LOCAL_DATA_KEY = '"--mybricks--'
 
@@ -56,6 +58,11 @@ export default function Designer({ appData }) {
 
   const [ctx, setCtx] = useState(() => {
     return {
+      fileId: appData.fileId,
+      sdk: {
+        projectId: appData.projectId,
+        openUrl: appData.openUrl,
+      },
       fontJS: appData.fileContent?.content?.fontJS
     }
   })
@@ -264,15 +271,41 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context })
         user: appData.user,
         onUpload: async (file: File) => {
           return new Promise(async (resolve, reject) => {
-            try {
-              const res = await upload(`api/theme/upload`, file);
-              console.log(res, 'onUpload')
-              resolve(res);
-            } catch (e) {
-              message.error('上传图片失败!');
-              reject(e);
+            const { manateeUserInfo, fileId } = ctx;
+            let uploadService = ctx.uploadService;
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("folderPath", `/files/${fileId}`);
+
+            const useConfigService = !!uploadService;
+
+            if (!useConfigService) {
+              uploadService = "/paas/api/flow/saveFile";
             }
-          })
+
+            try {
+              const res = await axios<any, any>({
+                url: uploadService,
+                method: "post",
+                data: formData,
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                  ...manateeUserInfo,
+                },
+              });
+              const { data = {} } = res.data;
+              const { url } = data;
+              if (!url) {
+                reject(`没有返回图片地址`);
+              }
+              const staticUrl = /^http/.test(url) ? url : `${getDomainFromPath(uploadService)}${url}`;
+              resolve({ url: staticUrl });
+              reject(`【图片上传出错】: ${message}`);
+            } catch (error) {
+              message.error(error.message);
+              reject(error);
+            }
+          });
         },
         onSearchUser: (keyword: string) => {
           return new Promise(async (resolve, reject) => {
@@ -311,8 +344,8 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context })
           resolve(['public/comlibs/h5.js'])
         } else {
           resolve([
-            'public/comlibs/mybricks.normal-pc.js',
             'public/comlibs/mybricks.basic-comlib.js',
+            'public/comlibs/mybricks.normal-pc.js',
           ])
         }
       })
@@ -359,88 +392,10 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context })
           },
         ]
       },
-      editorOptions: {
-        expression: {
-          CDN: {
-            codemirror: '/mfs/editor_assets/codemirror/codemirror_1.0.13_index.min.js'
-          }
-        },
-        richtext: {
-          CDN: {
-            tinymce: '/mfs/editor_assets/richText/tinymce/5.7.1/tinymce.min.js',
-            language: '/mfs/editor_assets/richText/tinymce/5.7.1/zh_CN.js',
-          }
-        },
-        align: {
-          CDN: {
-            left: '/mfs/editor_assets/align/left.defc4a63ebe8ea7d.svg',
-            rowCenter: '/mfs/editor_assets/align/center.c284343a9ff9672a.svg',
-            right: '/mfs/editor_assets/align/right.a7763b38b84b5894.svg',
-            top: '/mfs/editor_assets/align/top.98906024d52b69de.svg',
-            columnCenter: '/mfs/editor_assets/align/center.100376f4ade480cd.svg',
-            bottom: '/mfs/editor_assets/align/bottom.6ee532067ed440ca.svg',
-            column: '/mfs/editor_assets/align/column-space-between.31d560c0e611198f.svg',
-            row: '/mfs/editor_assets/align/row-space-between.ead5cd660c0f1c33.svg',
-          }
-        },
-        array: {
-          CDN: {
-            sortableHoc: '/mfs/editor_assets/react-sortable/react-sortable-hoc-2.0.0_index.umd.min.js'
-          }
-        },
-        expcode: {
-          CDN: {
-            prettier: {
-              standalone: '/mfs/editor_assets/prettier/2.6.2/standalone.js',
-              babel: '/mfs/editor_assets/prettier/2.6.2/parser-babel.js'
-            },
-            eslint: '/mfs/editor_assets/eslint/8.15.0/eslint.js',
-            paths: {
-              vs: "/mfs/editor_assets/monaco-editor/0.33.0/min/vs",
-            },
-            monacoLoader: '/mfs/editor_assets/monaco-editor/0.33.0/min/vs/loader.min.js'
-          }
-        },
-        csseditor: {
-          CDN: {
-            prettier: {
-              standalone: '/mfs/editor_assets/prettier/2.6.2/standalone.js',
-              babel: '/mfs/editor_assets/prettier/2.6.2/parser-babel.js'
-            },
-            eslint: '/mfs/editor_assets/eslint/8.15.0/eslint.js',
-            paths: {
-              vs: "/mfs/editor_assets/monaco-editor/0.33.0/min/vs",
-            },
-            monacoLoader: '/mfs/editor_assets/monaco-editor/0.33.0/min/vs/loader.min.js'
-          }
-        },
-        stylenew: {
-          CDN: {
-            prettier: {
-              standalone: '/mfs/editor_assets/prettier/2.6.2/standalone.js',
-              babel: '/mfs/editor_assets/prettier/2.6.2/parser-babel.js'
-            },
-            eslint: '/mfs/editor_assets/eslint/8.15.0/eslint.js',
-            paths: {
-              vs: "/mfs/editor_assets/monaco-editor/0.33.0/min/vs",
-            },
-            monacoLoader: '/mfs/editor_assets/monaco-editor/0.33.0/min/vs/loader.min.js'
-          }
-        },
-        code: {
-          CDN: {
-            prettier: {
-              standalone: '/mfs/editor_assets/prettier/2.6.2/standalone.js',
-              babel: '/mfs/editor_assets/prettier/2.6.2/parser-babel.js'
-            },
-            eslint: '/mfs/editor_assets/eslint/8.15.0/eslint.js',
-            paths: {
-              vs: "/mfs/editor_assets/monaco-editor/0.33.0/min/vs",
-            },
-            monacoLoader: '/mfs/editor_assets/monaco-editor/0.33.0/min/vs/loader.min.js'
-          }
-        }
-      }
+      editorOptions: mergeEditorOptions([
+        !!ctx.setting?.system.config?.isPureIntranet && PURE_INTERNET_EDITOR_OPTIONS,
+        DESIGN_MATERIAL_EDITOR_OPTIONS(ctx),
+      ]),
     },
     com: {
       env: {
