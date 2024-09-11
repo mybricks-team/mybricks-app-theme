@@ -1,5 +1,5 @@
 import API from '@mybricks/sdk-for-app/api'
-import ThemeEditor from './theme'
+import ThemeEditor from './theme2'
 
 export default ({ editConfig, designerRef, context }, { fileId }) => {
   if (editConfig && !editConfig.upload) {

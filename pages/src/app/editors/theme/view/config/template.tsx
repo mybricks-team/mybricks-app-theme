@@ -3,13 +3,15 @@ import React, {
   useMemo,
   useState,
   useCallback,
-  useEffect
+  useEffect,
+  useContext
 } from 'react'
 
 import { message } from 'antd'
 import domToImage from 'dom-to-image'
 import API from '@mybricks/sdk-for-app/api'
 import { getCssVarToValueMap, getStyleInnerText , traverse} from './utils'
+import { ThemeEditorContext } from "../../../theme2"
 import {
   Button,
   Select,
@@ -36,7 +38,23 @@ import configStyle from './index.less'
 export const maxCompTemplate = 1
 
 export function DesignTemplate () {
-  const { data, component, popView } = useThemeEditorContext()
+  // const { data, component, popView } = useThemeEditorContext()
+  const { designer, editConfig, context } = useContext(ThemeEditorContext);
+  const { data, component, popView } = useMemo(() => {
+    const { themes, components } = designer
+    const { popView } = editConfig
+
+    return {
+      get data() {
+        return context.theme
+      },
+      themes,
+      component: {
+        getAll: components.getAll
+      },
+      popView
+    }
+  }, [])
   const [themePanlOpen, setThemePanlOpen] = useState(false)
   const [templatePanelFormData, setTemplatePanelFormData] = useState(null)
   const [templates, setTemplates] = useState<Data['templates']>([])

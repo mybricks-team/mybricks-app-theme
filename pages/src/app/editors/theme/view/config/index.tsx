@@ -2,11 +2,12 @@ import React, {
   useRef,
   useMemo,
   useState,
-  useCallback
+  useCallback,
+  useContext
 } from 'react'
 import { createPortal } from 'react-dom'
 import { DesignTemplate } from './template'
-import { message } from 'antd'
+import { message, Segmented } from 'antd'
 import domToImage from 'dom-to-image'
 import API from '@mybricks/sdk-for-app/api'
 
@@ -24,6 +25,7 @@ import { DesignAll } from './all'
 import { useUpdateEffect } from '../hooks'
 import { uuid, deepCopy } from '../../../utils'
 import { useThemeEditorContext } from '../../index'
+import { ThemeEditorContext } from "../../../theme2"
 
 import type { Data, Component } from '../type'
 
@@ -105,6 +107,7 @@ export const ConfigView = () => {
   return (
     <div className={viewStyle.view}>
       <Toggle
+        // block
         defaultValue={'all'}
         options={TOGGLE_OPTIONS}
         onChange={onToggleChange}
@@ -321,7 +324,23 @@ export function traverse (slots) {
 }
 
 function DesignComponent () {
-  const { data, component, popView } = useThemeEditorContext()
+  // const { data, component, popView } = useThemeEditorContext()
+  const { designer, editConfig, context } = useContext(ThemeEditorContext);
+  const { data, component, popView } = useMemo(() => {
+    const { themes, components } = designer
+    const { popView } = editConfig
+
+    return {
+      get data() {
+        return context.theme
+      },
+      themes,
+      component: {
+        getAll: components.getAll
+      },
+      popView
+    }
+  }, [])
   const [themePanlOpen, setThemePanlOpen] = useState(false)
   const [themePanelFormData, setThemePanelFormData] = useState(null)
   const [themes, setThemes] = useState<Data['themes']>([])

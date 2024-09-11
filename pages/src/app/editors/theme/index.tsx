@@ -491,7 +491,7 @@ export function useThemeEditorContext () {
   return context
 }
 
-function StyleEditorProvider ({children, value}: ThemeEditorProviderProps) {
+export function StyleEditorProvider ({children, value}: ThemeEditorProviderProps) {
   return (
     <ThemeEditorContext.Provider value={value}>
       {children}

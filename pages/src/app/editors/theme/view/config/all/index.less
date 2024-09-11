@@ -169,8 +169,14 @@
 }
 
 .cssModeSelect {
-  padding-top
-  : 3px;
+  padding-top: 3px;
+  :global {
+    .ant-segmented-item-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 }
 
 .switchIcon {
@@ -263,4 +269,138 @@
 
 .center {
   justify-content: center !important;
+}
+
+.themeSelect {
+  margin-top: 3px;
+  height: 44px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 6px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.85098);
+  padding: 0px 6px;
+
+  &:hover {
+    background-color: rgba(51, 51, 51, 0.09);
+  }
+
+  .themeSelectLeft {
+    display: flex;
+    align-items: center;
+  }
+
+  .themeSelectRight {
+    :global {
+      .anticon {
+        margin-left: 8px;
+        &:hover {
+          color: @color-primary;
+        }
+      }
+    }
+  }
+
+  .themeSelectColor {
+    height: 32px;
+    width: 32px;
+    margin-right: 8px;
+    border-radius: 6px;
+  }
+}
+
+.themePopAdd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 0px 6px;
+  &:hover {
+    background-color: rgba(51, 51, 51, 0.09);
+  }
+}
+
+.themePopAddForm {
+  .form {
+    width: 100%;
+    padding: 0px 10px;
+  
+    &Item {
+      display: flex;
+      flex-direction: row;
+      margin: 20px 0;
+      align-items: center;
+      font-size: 12px;
+  
+      label {
+        width: 36px;
+        text-align: right;
+        padding-right: 5px;
+        font-size: 12px;
+    
+        i {
+          font-style: normal;
+          color: #FF0000;
+        }
+      }
+  
+      .editor {
+        flex: 1;
+        display: flex;
+        position: relative;
+        padding-left: 6px;
+      }
+  
+      .textEdt {
+        input, textarea {
+          border: 1px solid #DDD;
+          border-radius: 3px;
+          padding: 5px;
+          background: #FFF;
+          width: 100%;
+          line-height: 1;
+          &::placeholder {
+            overflow: hidden;
+            color: #bfbfbf;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+          &:focus {
+            border: 1px solid @color-primary;
+          }
+        }
+    
+        textarea {
+          min-height: 50px;
+        }
+  
+        .colorRectangle {
+          border-radius: 4px;
+          height: 24px;
+          width: 72px;
+          cursor: pointer;
+          position: relative;
+          box-shadow: 0 1px 4px -2px #777;
+        }
+      }
+  
+      .error {
+        input {
+          border: 1px solid #FF0000 !important;
+        }
+        
+        // &::after {
+        //   content: attr(data-err);
+        //   color: red;
+        //   position: absolute;
+        //   bottom: -17px;
+        // }
+      }
+    }
+  }
 }

@@ -90,11 +90,16 @@ export interface Data {
     components: Array<ComTemplate>
   }>
   variables: Array<{
-    id: string
-    configs: Array<{
-      name?: string
-      key: string
-      value: string
+    active: boolean;
+    key: string;
+    title: string;
+    variables: Array<{
+      id: string
+      configs: Array<{
+        name?: string
+        key: string
+        value: string
+      }>
     }>
   }>
 }
