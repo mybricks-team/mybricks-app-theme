@@ -39,7 +39,7 @@ const BoxShadowIcon = <svg xmlns="http://www.w3.org/2000/svg" width="16" height=
 const FilterIcon = <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" data-v-6ec2bbd6=""><circle opacity="0.4" cx="8" cy="15.5" r="5.5"></circle><circle opacity="0.7" cx="16" cy="15.5" r="5.5"></circle><circle cx="12" cy="8.5" r="5.5"></circle></svg>
 const CSS_MODE_OPTIONS = [
   { label: ColorIcon, value: 'color', tip: '颜色' },
-  { label: TextIcon, value: 'text', tip: '文字', disabled: true },
+  // { label: TextIcon, value: 'text', tip: '文字', disabled: true },
   { label: BorderIcon, value: 'border', tip: '边框', disabled: true },
   { label: BoxShadowIcon, value: 'boxShadow', tip: '阴影', disabled: true },
   { label: FilterIcon, value: 'filter', tip: '滤镜', disabled: true }
