@@ -63,7 +63,8 @@ export default function Designer({ appData }) {
         projectId: appData.projectId,
         openUrl: appData.openUrl,
       },
-      fontJS: appData.fileContent?.content?.fontJS
+      fontJS: appData.fileContent?.content?.fontJS,
+      setting: appData.config || {},
     }
   })
 
@@ -187,6 +188,7 @@ export default function Designer({ appData }) {
   }, [])
 
   const RenderLocker = useMemo(() => {
+    console.log("ctx: ", ctx)
     return (
       <Locker
         statusChange={(status) => {
@@ -393,7 +395,8 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context })
         ]
       },
       editorOptions: mergeEditorOptions([
-        !!ctx.setting?.system.config?.isPureIntranet && PURE_INTERNET_EDITOR_OPTIONS,
+        !!ctx.setting?.system.config?.isPureIntranet &&
+        PURE_INTERNET_EDITOR_OPTIONS,
         DESIGN_MATERIAL_EDITOR_OPTIONS(ctx),
       ]),
     },
