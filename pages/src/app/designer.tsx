@@ -3,7 +3,8 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef
+  useRef,
+  useLayoutEffect
 } from 'react'
 
 import axios from 'axios'
@@ -25,10 +26,15 @@ import { createFromIconfontCN } from '@ant-design/icons'
 
 import { DESIGN_MATERIAL_EDITOR_OPTIONS, mergeEditorOptions, PURE_INTERNET_EDITOR_OPTIONS } from "./editor-options";
 
+import comlibLoader from "./configs/comLibLoader";
+import comLibAdder from "./configs/comLibAdder";
+import { getInitComLibs } from './configs/utils/getComlibs'
+
 const SPADesigner = window.mybricks.SPADesigner
 // const LOCAL_DATA_KEY = '"--mybricks--'
 
 export default function Designer({ appData }) {
+  const [ready, setReady] = useState(false);
   const designerRef = useRef<{ 
     dump: () => any, 
     toJSON: () => any, 
@@ -65,8 +71,23 @@ export default function Designer({ appData }) {
       },
       fontJS: appData.fileContent?.content?.fontJS,
       setting: appData.config || {},
+      comlibs: [],
+      latestComlibs: [],
+      hasMaterialApp: appData.hasMaterialApp,
     }
   })
+
+  useLayoutEffect(() => {
+    getInitComLibs(appData)
+    .then(async ({ comlibs, latestComlibs }) => {
+      const newComlibs = comlibs
+
+      setCtx((pre) => ({ ...pre, comlibs: newComlibs, latestComlibs }))
+    })
+    .finally(() => {
+      setReady(true);
+    })
+  }, [])
 
   //页面刷新的时候，添加fontJS资源
   useEffect(() => {
@@ -115,9 +136,10 @@ export default function Designer({ appData }) {
     json.theme = context.theme
     json.componentType = context.componentType
     json.fontJS = ctx.fontJS
+    json.comlibs = ctx.comlibs
 
     return json
-  }, [])
+  }, [ctx])
 
   const onSaveClick = useCallback(() => {
     setSaveLoading(true)
@@ -188,7 +210,6 @@ export default function Designer({ appData }) {
   }, [])
 
   const RenderLocker = useMemo(() => {
-    console.log("ctx: ", ctx)
     return (
       <Locker
         statusChange={(status) => {
@@ -240,7 +261,7 @@ export default function Designer({ appData }) {
         />
       </Toolbar>
       <div className={css.designer}>
-        <SPADesigner
+        {ready && <SPADesigner
           ref={designerRef}
           config={spaDesignerConfig({
             ctx,
@@ -250,7 +271,7 @@ export default function Designer({ appData }) {
             context 
           })}
           onEdit={onEdit}
-        />
+        />}
       </div>
     </div>
   )
@@ -259,6 +280,7 @@ export default function Designer({ appData }) {
 function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context }) {
   const content = appData.fileContent?.content || {}
   const isH5 = content.componentType === 'H5'
+  const localComlibs = JSON.parse(localStorage.getItem('MYBRICKS_APP_THEME_COMLIBS'))
 
   return {
     shortcuts: {
@@ -335,23 +357,41 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context })
       }),
       // toolsPlugin(),
     ],
-    comLibLoader() {
-      return new Promise((resolve) => {
-        
-        // TODO: 先写死
-        const localComlibs = JSON.parse(localStorage.getItem('MYBRICKS_APP_THEME_COMLIBS'))
-        if (localComlibs) {
-          resolve(localComlibs)
-        } else if (isH5) {
-          resolve(['public/comlibs/h5.js'])
-        } else {
-          resolve([
-            'public/comlibs/mybricks.basic-comlib.js',
-            'public/comlibs/mybricks.normal-pc.js',
-          ])
+    ...(ctx.hasMaterialApp && !localComlibs && !isH5
+      ? {
+          comLibAdder: comLibAdder(ctx),
         }
-      })
+      : {}),
+    comLibLoader(params) {
+      if (localComlibs || isH5) {
+        return new Promise((resolve) => {
+          if (localComlibs) {
+            resolve(localComlibs)
+          } else if (isH5) {
+            resolve(['public/comlibs/h5.js'])
+          }
+        })
+      }
+
+      return comlibLoader(ctx)(params)
     },
+    // comLibLoader() {
+    //   return new Promise((resolve) => {
+        
+    //     // TODO: 先写死
+    //     const localComlibs = JSON.parse(localStorage.getItem('MYBRICKS_APP_THEME_COMLIBS'))
+    //     if (localComlibs) {
+    //       resolve(localComlibs)
+    //     } else if (isH5) {
+    //       resolve(['public/comlibs/h5.js'])
+    //     } else {
+    //       resolve([
+    //         'public/comlibs/mybricks.basic-comlib.js',
+    //         'public/comlibs/mybricks.normal-pc.js',
+    //       ])
+    //     }
+    //   })
+    // },
     pageContentLoader() {
       return new Promise((resolve) => {
         resolve(appData.fileContent.content)

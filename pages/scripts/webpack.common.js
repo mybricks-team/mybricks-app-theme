@@ -12,6 +12,7 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
+      APP_TYPE: JSON.stringify("react"),
       APP_NAME: JSON.stringify(require('../../package.json').name),
       APP_VERSION: JSON.stringify(require('../../package.json').version),
       RENDERWEB_VERSION: JSON.stringify(require('../node_modules/@mybricks/render-web/package.json').version),
