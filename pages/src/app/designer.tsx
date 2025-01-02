@@ -162,7 +162,7 @@ export default function Designer({ appData }) {
     }).catch((err) => {
       console.error(err)
     })
-  }, [operable])
+  }, [ctx, operable])
 
   const onPublishClick = useCallback(async () => {
     setPublishLoading(true)
@@ -193,7 +193,7 @@ export default function Designer({ appData }) {
     }
 
     setPublishLoading(false)
-  }, [operable])
+  }, [ctx, operable])
 
   useEffect(() => {
     if (beforeunload) {
