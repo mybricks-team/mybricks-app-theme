@@ -29,12 +29,13 @@ import { DESIGN_MATERIAL_EDITOR_OPTIONS, mergeEditorOptions, PURE_INTERNET_EDITO
 import comlibLoader from "./configs/comLibLoader";
 import comLibAdder from "./configs/comLibAdder";
 import { getInitComLibs } from './configs/utils/getComlibs'
+import { DESIGNER_STATIC_PATH } from "../constants";
+import { getDomainFromPath } from "../utils";
 
-const SPADesigner = window.mybricks.SPADesigner
 // const LOCAL_DATA_KEY = '"--mybricks--'
 
 export default function Designer({ appData }) {
-  const [ready, setReady] = useState(false);
+  const [SPADesigner, setSPADesigner] = useState(null)
   const designerRef = useRef<{ 
     dump: () => any, 
     toJSON: () => any, 
@@ -62,8 +63,23 @@ export default function Designer({ appData }) {
     }
   }, [])
 
+  const appConfig = useMemo(() => {
+    let config = null
+    try {
+      const originConfig = appData.config[APP_NAME]?.config || {}
+      config =
+        typeof originConfig === 'string'
+          ? JSON.parse(originConfig)
+          : originConfig
+    } catch (error) {
+      console.error('get appConfig error', error)
+    }
+    return config || {}
+  }, [appData.config[APP_NAME]?.config])
+
   const [ctx, setCtx] = useState(() => {
     return {
+      user: appData.user,
       fileId: appData.fileId,
       sdk: {
         projectId: appData.projectId,
@@ -74,8 +90,22 @@ export default function Designer({ appData }) {
       comlibs: [],
       latestComlibs: [],
       hasMaterialApp: appData.hasMaterialApp,
+      uploadService: appConfig?.uploadServer?.uploadService || ''
     }
   })
+
+  const loadDesigner = useCallback(() => {
+    const designer = appConfig.designer?.url || DESIGNER_STATIC_PATH
+    if (designer) {
+      const script = document.createElement('script')
+      script.src = designer
+      document.head.appendChild(script)
+      script.onload = () => {
+        ;(window as any).mybricks.SPADesigner &&
+          setSPADesigner((window as any).mybricks.SPADesigner)
+      }
+    }
+  }, [])
 
   useLayoutEffect(() => {
     getInitComLibs(appData)
@@ -84,9 +114,7 @@ export default function Designer({ appData }) {
 
       setCtx((pre) => ({ ...pre, comlibs: newComlibs, latestComlibs }))
     })
-    .finally(() => {
-      setReady(true);
-    })
+    .finally(loadDesigner)
   }, [])
 
   //页面刷新的时候，添加fontJS资源
@@ -217,6 +245,7 @@ export default function Designer({ appData }) {
           operableRef.current = status === 1
         }}
         compareVersion={true}
+        autoLock={true}
       />
     )
   }, [])
@@ -261,7 +290,7 @@ export default function Designer({ appData }) {
         />
       </Toolbar>
       <div className={css.designer}>
-        {ready && <SPADesigner
+        {SPADesigner && <SPADesigner
           ref={designerRef}
           config={spaDesignerConfig({
             ctx,
@@ -292,7 +321,7 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context })
         file: appData.fileContent || {}
       }),
       notePlugin({
-        user: appData.user,
+        user: ctx.user,
         onUpload: async (file: File) => {
           return new Promise(async (resolve, reject) => {
             const { manateeUserInfo, fileId } = ctx;
@@ -322,7 +351,9 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context })
               if (!url) {
                 reject(`没有返回图片地址`);
               }
-              const staticUrl = /^http/.test(url) ? url : `${getDomainFromPath(uploadService)}${url}`;
+              const staticUrl = /^http/.test(url)
+                ? url
+                : `${getDomainFromPath(uploadService)}${url}`;
               resolve({ url: staticUrl });
               reject(`【图片上传出错】: ${message}`);
             } catch (error) {
@@ -331,29 +362,48 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context })
             }
           });
         },
+        onAtsEmail: ({ subject, to, body, extra, from }) => {
+          let data = { fileId: ctx.fileId, subject, to, body, extra, from };
+          const config = appData.config[APP_NAME]?.config;
+          const serviceApi = config?.emailApiConfig?.sendAtsEmailApi || "";
+          if (serviceApi) {
+            axios({
+              method: "POST",
+              url: serviceApi,
+              withCredentials: false,
+              data,
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }).catch((err) => {
+              console.log("err", err);
+            });
+          }
+        },
         onSearchUser: (keyword: string) => {
           return new Promise(async (resolve, reject) => {
             try {
               const res = await searchUser(`api/theme/searchUser`, {
-                keyword
+                keyword,
               });
-              const formatRes = (res || []).map(item => {
+              // @ts-ignore
+              const formatRes = (res || []).map((item) => {
                 const { email, id, name, avatar } = item;
                 return {
                   name: name ? `${name}(${email})` : email,
                   id,
                   username: email,
-                  orgDisplayName: '',
-                  thumbnailAvatarUrl: avatar
-                }
-              })
+                  orgDisplayName: "",
+                  thumbnailAvatarUrl: avatar,
+                };
+              });
               resolve(formatRes);
             } catch (e) {
-              message.error('搜索用户失败!');
-              reject('搜索用户失败!');
+              message.error("搜索用户失败!");
+              reject("搜索用户失败!");
             }
-          })
-        }
+          });
+        },
       }),
       // toolsPlugin(),
     ],

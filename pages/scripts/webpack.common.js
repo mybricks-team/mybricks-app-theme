@@ -2,7 +2,8 @@ const path = require('path')
 const webpack = require('webpack')
 module.exports = {
   entry: {
-    ['index']: path.resolve(__dirname, '../src/app/index.tsx'),
+    ['index']: path.resolve(__dirname, '../src/pages/design/index.tsx'),
+    ['setting']: path.resolve(__dirname, '../src/pages/setting/globalSettingIndex.tsx'),
   },
   output: {
     // 打包文件根目录

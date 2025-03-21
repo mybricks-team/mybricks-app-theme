@@ -19,7 +19,7 @@ module.exports = merge(common, {
     static: {
       directory: path.resolve(rootPath, './templates'),
     },
-    port: 9988,
+    port: 6767,
     host: 'localhost',
     hot: true,
     client: {
@@ -37,7 +37,7 @@ module.exports = merge(common, {
         context: ['/'],
         // target: 'http://testweb.manateeai.com/',
         // target: 'http://localhost:3100',
-        target: 'https://test.mybricks.world',
+        target: 'https://my.mybricks.world',
         secure: false,
         changeOrigin: true,
         bypass: function (req) {
@@ -59,6 +59,11 @@ module.exports = merge(common, {
         content = content.replace('<!-- _APP_CONFIG_ -->', `<script>const _APP_CONFIG_ = {namespace: '${pkg.name}'}</script>`)
         return content
       }
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'setting.html',
+      template: path.resolve(__dirname, '../templates/setting.html'),
+      chunks: ['setting'],
     }),
   ]
 });

@@ -8,3 +8,5 @@ interface Window {
 		SPADesigner(props: any): React.JSX.Element
 	}
 }
+
+declare const APP_NAME: string;
