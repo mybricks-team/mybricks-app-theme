@@ -5,6 +5,31 @@ export interface CSSFromStyle {
   css: CSSProperties
 }
 
+export interface Slot {
+  id: string
+  type: string
+  title: string
+  style: any
+  comAry: Array<Component>
+}
+
+export interface Component {
+  id: string
+  title: string
+  dom: HTMLDivElement
+  def: {
+    namespace: string
+    version: string
+    title: string
+  }
+  model: {
+    css?: Array<CSSFromStyle>
+    data?: Record<string, any>
+  }
+  style?: React.CSSProperties
+  slots?: Array<Slot>
+}
+
 /** 组件主题 */
 export interface ComTheme {
   id: string
