@@ -37,6 +37,11 @@ module.exports = merge(common, {
       template: path.resolve(__dirname, '../templates/index.html'),
       chunks: ['index'],
     }),
+    new HtmlWebpackPlugin({
+      filename: 'setting.html',
+      template: path.resolve(__dirname, '../templates/setting.html'),
+      chunks: ['setting'],
+    }),
     new HtmlWebpackInlineSourcePlugin()
   ]
 });
