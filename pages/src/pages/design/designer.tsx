@@ -31,6 +31,7 @@ import comLibAdder from "./configs/comLibAdder";
 import { getInitComLibs } from './configs/utils/getComlibs'
 import { DESIGNER_STATIC_PATH } from "../constants";
 import { getDomainFromPath } from "../utils";
+import { initThemeGlobal } from "./editors/ThemeGlobal"
 
 // const LOCAL_DATA_KEY = '"--mybricks--'
 
@@ -237,6 +238,10 @@ export default function Designer({ appData }) {
     setBeforeunload(true);
   }, [])
 
+  const onLoad = useCallback(() => {
+    initThemeGlobal({ designer: designerRef.current, context })
+  }, [])
+
   const RenderLocker = useMemo(() => {
     return (
       <Locker
@@ -292,6 +297,7 @@ export default function Designer({ appData }) {
       <div className={css.designer}>
         {SPADesigner && <SPADesigner
           ref={designerRef}
+          onLoad={onLoad}
           config={spaDesignerConfig({
             ctx,
             appData, 
@@ -455,13 +461,22 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context })
         editConfig.fontJS = ctx.fontJS
         return myEditors({ editConfig, designerRef, context }, { fileId: appData.fileId })
       },
-      items(_, cate0) {
-        cate0.title = '主题包'
+      items(_, cate0, cate1, cate2) {
+        cate0.title = '组件'
         cate0.items = [
           {
-            title: '主题包配置',
-            type: 'Theme'
+            type: 'ThemeComponent'
           },
+        ];
+        cate1.title = "设计规范";
+        cate1.items = [
+          {
+            type: 'ThemeGlobal'
+          },
+        ];
+
+        cate2.title = "其它";
+        cate2.items = [
           {
             items: [
               {
@@ -482,7 +497,7 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context })
               },
             ],
           },
-        ]
+        ];
       },
       editorOptions: mergeEditorOptions([
         !!ctx.setting?.system.config?.isPureIntranet &&
