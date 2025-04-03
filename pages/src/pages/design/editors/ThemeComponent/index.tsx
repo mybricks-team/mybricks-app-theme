@@ -518,9 +518,6 @@ function ThemePanel ({
     }
     const result = validate()
     if (result) {
-      const messageKey = 'upload' + uuid()
-      message.loading({ content: '预览图生成中...', key: messageKey });
-      setSaveLoading(true)
       const { themeId } = result
       const option = options.find((option) => option.value === themeId)
       const dom = option.dom
@@ -529,6 +526,10 @@ function ThemePanel ({
         onOk(result)
         return
       }
+
+      const messageKey = 'upload' + uuid()
+      message.loading({ content: '预览图生成中...', key: messageKey });
+      setSaveLoading(true)
 
       const copyDom = dom.cloneNode(true)
 
