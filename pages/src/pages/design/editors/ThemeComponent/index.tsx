@@ -142,6 +142,7 @@ const ThemeComponent = () => {
   useUpdateEffect(() => {
     if (themePanlOpen) {
       const { id, namespace } = themePanelFormData
+      const namespaceToAllMap = getNamespaceToAllMap(traverse(component.getAll()).reduce((f, s) => [...f, ...s], []));
       const { title, options } = namespaceToAllMap[namespace]
 
       popView(`${id ? '编辑' : `新建"${title}"`}组件规范`, ({ close }) => {
@@ -156,7 +157,7 @@ const ThemeComponent = () => {
             themeIdToThemeMap={themeIdToThemeMap}
           />
         )
-      }, {width: 320, beforeEditView: true})
+      }, {width: 320, beforeEditView: true, onClose: onAddThemePanelCancel})
     }
   }, [themePanlOpen, themePanelFormData])
 
@@ -252,6 +253,44 @@ const ThemeComponent = () => {
 
 export default ThemeComponent;
 
+const getNamespaceToAllMap = (pageComponents: Array<Component>) => {
+  const namespaceToAllMap = {}
+  const namespaceMap = {}
+  const notInPageNamespaceMap = {}
+
+  pageComponents.forEach(({
+    id,
+    def: {
+      title: defTitle,
+      namespace
+    },
+    model: {
+      css, 
+    },
+    title,
+    dom
+  }) => {
+
+    Reflect.deleteProperty(notInPageNamespaceMap, namespace)
+
+    if (!namespaceMap[namespace]) {
+      namespaceMap[namespace] = true
+    }
+
+    if (!namespaceToAllMap[namespace]) {
+      namespaceToAllMap[namespace] = {
+        title: defTitle,
+        options: []
+      }
+    }
+
+    if (css) {
+      namespaceToAllMap[namespace].options.push({label: title, value: id, dom})
+    }
+  })
+
+  return namespaceToAllMap;
+}
 
 export function initThemeInfo (pageComponents: Array<Component>, themes: ThemeData['themes']) {
   const namespaceToAllMap = {}
@@ -399,6 +438,12 @@ function ThemePanel ({
       const { themeId } = result
       const option = options.find((option) => option.value === themeId)
       const dom = option.dom
+
+      if (!dom) {
+        onOk(result)
+        return
+      }
+
       const copyDom = dom.cloneNode(true)
 
       copyDom.style.top = '0px'
