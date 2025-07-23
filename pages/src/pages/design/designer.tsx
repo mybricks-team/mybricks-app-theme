@@ -32,6 +32,8 @@ import { getInitComLibs } from './configs/utils/getComlibs'
 import { DESIGNER_STATIC_PATH } from "../constants";
 import { getDomainFromPath } from "../utils";
 import { initThemeGlobal } from "./editors/ThemeGlobal"
+import classNames from "classnames";
+import { publish as publish_icon } from './icon/publish'
 
 // const LOCAL_DATA_KEY = '"--mybricks--'
 
@@ -266,11 +268,26 @@ export default function Designer({ appData }) {
           onClick={onSaveClick}
           dotTip={beforeunload}
         />
-        <Toolbar.Button
+        {/* <Toolbar.Button
           disabled={!operable}
           loading={publishLoading}
           onClick={onPublishClick}
-        >发布</Toolbar.Button>
+        >发布</Toolbar.Button> */}
+        <div
+          data-mybricks-tip={`{content:'发布',position:'bottom'}`} 
+          className={
+            classNames({
+            [css.publish_btn]: true,
+            [css.btn_disable]: !operable
+          })
+          } 
+          onClick={() => {
+            if(!operable) return
+            //在调试模式，不给点击
+            onPublishClick()
+          }}>
+          {publish_icon}
+        </div>
         <Toolbar.Tools
           onImport={(value) => {
             try {
@@ -548,6 +565,7 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context })
           'public/antd-4.21.6/antd.variable.min.css'
         ],
       },
+      toolbarContainer: '#sdk_toolbar_center',
     }
   }
 }
