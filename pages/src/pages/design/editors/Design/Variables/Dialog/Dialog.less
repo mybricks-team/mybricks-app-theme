@@ -1,0 +1,615 @@
+@import url("../theme.less");
+
+.dialog {
+  position: fixed;
+  z-index: 1029;
+  display: none;
+  // top: 50%;
+  // left: 50%;
+  // transform: translate(-50%, -50%);
+  // width: 1000px;
+  // height: 380px;
+
+  &.dialogShow {
+    display: block;
+  }
+
+  .contents {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    color: #000000e5;
+    border-radius: 13px;
+    background: #ffffff;
+    box-shadow: 0 2px 5px 0 #00000026, 0 10px 16px 0 #0000001f, 0 0 .5px 0 #0000001f;
+    overflow: hidden;
+
+    .header {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      line-height: 40px;
+      box-sizing: border-box;
+      box-shadow: inset 0 -1px #e6e6e6;
+
+      .sidebar {
+        height: 40px;
+        width: 200px;
+        border-right: 1px solid #e6e6e6;
+        padding-left: 15px;
+        .font();
+      }
+
+      .operate {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 8px;
+      }
+    }
+
+    .body {
+      flex: 1;
+      display: flex;
+
+      .sidebar {
+        width: 200px;
+        border-right: 1px solid #e6e6e6;
+
+        .switch {
+          height: 40px;
+          box-sizing: border-box;
+          border-bottom: 1px solid #e6e6e6;
+          padding: 0px 15px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          cursor: pointer;
+
+          .hover();
+
+          .title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #000000e5;
+          }
+
+          .count {
+            font-size: 11px;
+            font-weight: 400;
+            color: #00000080;
+          }
+
+          &.focus {
+            background: #f5f5f5;
+          }
+        }
+      }
+
+      .content {
+        flex: 1;
+        width: 0;
+        display: flex;
+        flex-direction: column;
+
+        .antd();
+
+        .tableColumnVariableName {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 16px;
+          height: 100%;
+
+          &.tableColumnVariableNameEditAble {
+            outline: 1px solid var(--mybricks-color-primary);
+            outline-offset: -1px;
+          }
+
+          &:hover {
+            .tableColumnEditVariable {
+              opacity: 1;
+            }
+            .operateContainer .button {
+              opacity: 1;
+            }
+          }
+
+          .title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            span {
+              white-space: nowrap;
+            }
+
+            input {
+              cursor: default;
+            }
+          }
+        }
+
+        .tableColumnAddTheme {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .tableColumnEditVariable {
+          display: flex;
+          align-items: center;
+          opacity: 0;
+          border-radius: 5px;
+          cursor: pointer;
+
+          &:hover {
+            background: #0000000d;
+            opacity: 1;
+          }
+
+          &>* {
+            pointer-events: none;
+          }
+
+          &[data-active="true"] {
+            opacity: 1;
+            background: transparent;
+
+            svg {
+              color: var(--mybricks-color-primary);
+            }
+          }
+        }
+
+        .tableColumnEditVariableClose {
+          width: 24px;
+          height: 24px;
+          position: absolute;
+          cursor: pointer;
+          right: 16px;
+        }
+
+        .tableColumnVariableValue {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          padding: 0 16px;
+        }
+
+        .table {
+          flex: 1;
+          position: relative;
+          overflow: hidden;
+
+          .empty {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 12px;
+            opacity: 0;
+            z-index: 0;
+
+            span {
+              font-weight: 550;
+            }
+
+            button {
+              font-size: 11px;
+              border-radius: 5px;
+              font-weight: 450;
+              height: 24px;
+              line-height: 16px;
+              padding: 0 8px;
+              color: #ffffff;
+              background-color: var(--mybricks-color-primary);
+              cursor: pointer;
+            }
+
+            &.emptyActive {
+              opacity: 1;
+              z-index: 1;
+            }
+          }
+        }
+
+        .addVariable {
+          padding: 0 16px;
+          font-size: 12px;
+          font-weight: 450;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          border-top: 1px solid #e6e6e6;
+        }
+      }
+    }
+  }
+}
+
+.iconButton {
+  .triggerButton();
+  .icon();
+}
+
+.colorPickerPopover {
+  padding: 0;
+}
+
+.antd {
+  :global {
+    .mb-table-wrapper .mb-table.mb-table-bordered>.mb-table-container {
+      border-top: none;
+    }
+
+    .mb-table.mb-table-bordered>.mb-table-container {
+      border-left: none;
+    }
+
+    .mb-table.mb-table-bordered>.mb-table-container>.mb-table-content>table,
+    .mb-table.mb-table-bordered>.mb-table-container>.mb-table-header>table {
+      border-top: none;
+    }
+
+    .mb-table-wrapper .mb-table.mb-table-bordered>.mb-table-container>.mb-table-header>table>thead>tr>th {
+      border-inline-color: #e6e6e6;
+    }
+
+    .mb-table-wrapper .mb-table.mb-table-bordered>.mb-table-container>.mb-table-body>table>tbody>tr>td {
+      border-inline-color: #e6e6e6;
+    }
+
+    .mb-table-tbody>tr>td,
+    .mb-table-thead>tr>th {
+      border-color: #e6e6e6;
+      font-size: 11px;
+      font-weight: 450;
+      height: 40px;
+      padding: 0;
+      color: #000000e5;
+      background: #ffffff;
+
+      &:last-child {
+        border-right: none;
+      }
+    }
+
+    .mb-table-thead>tr>th {
+      &:first-child {
+        padding: 0 16px;
+      }
+    }
+
+    .mb-table-thead>tr>th {
+      font-weight: 600;
+    }
+
+    .mb-color-picker-trigger {
+      min-width: unset;
+      min-height: unset;
+      width: 16px;
+      height: 16px;
+      border: none;
+      padding: 0;
+    }
+
+    .mb-color-picker-trigger .mb-color-picker-color-block {
+      width: 16px;
+      height: 16px;
+      border-radius: 20%;
+    }
+
+    .mb-color-picker-trigger .mb-color-picker-color-block .mb-color-picker-color-block-inner {
+      box-shadow: inset 0px 0px 0px 1px #0000001a;
+    }
+
+    .mb-color-picker-trigger.mb-color-picker-trigger-active {
+      box-shadow: none;
+    }
+
+    .mb-input {
+      padding: 0;
+      font-size: 11px;
+      font-weight: 450;
+      color: #000000e5;
+    }
+  }
+}
+
+.tableColumnVariableValue {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 100%;
+  font-size: 11px;
+  font-weight: 450;
+
+  &.tableColumnVariableValueEditAble {
+    outline: 1px solid var(--mybricks-color-primary);
+    outline-offset: -1px;
+  }
+
+  input {
+    cursor: default
+  }
+
+  .antd();
+}
+
+.tableColumnTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 16px;
+  height: 100%;
+
+  .active {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--mybricks-color-primary);
+    position: absolute;
+    left: 4px;
+    top: 15.5px;
+  }
+
+  &.tableColumnTitleEditAble {
+    outline: 1px solid var(--mybricks-color-primary);
+    outline-offset: -1px;
+  }
+
+   &:hover {
+    .operateContainer .button {
+      opacity: 1;
+    }
+  }
+
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  input {
+    flex: 1;
+    width: 0;
+    cursor: default;
+  }
+
+  .operate {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    button {
+      opacity: 0;
+    }
+  }
+
+  &:hover {
+    button {
+      opacity: 1;
+    }
+  }
+
+  :global {
+    .mb-radio-wrapper {
+      font-size: 11px;
+      line-height: 1;
+      margin-right: 0px;
+
+      .mb-radio-inner {
+        width: 12px;
+        height: 12px;
+      }
+
+      .mb-radio-checked .mb-radio-inner {
+        border-color: var(--mybricks-color-primary);
+        background-color: var(--mybricks-color-primary);
+        width: 12px;
+        height: 12px;
+      }
+    }
+
+    .mb-radio-wrapper:hover .mb-radio-inner {
+      border-color: var(--mybricks-color-primary);
+    }
+  }
+}
+
+.basicDialog {
+  position: fixed;
+  z-index: 1030;
+  display: none;
+  width: 280px;
+  color: #000000e5;
+  border-radius: 13px;
+  background: #ffffff;
+  box-shadow: 0 2px 5px 0 #00000026, 0 10px 16px 0 #0000001f, 0 0 .5px 0 #0000001f;
+
+  &.basicDialogShow {
+    display: block;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+    padding: 0 16px;
+    box-shadow: inset 0 -1px #e6e6e6;
+    font-size: 12px;
+    font-weight: 550;
+  }
+
+  .content {
+    border-bottom: 1px solid #e6e6e6;
+    padding: 16px;
+    width: 100%;
+
+    .editContainerTitle {
+      color: #000000e5;
+      font-size: 11px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    span {
+      color: #000000e5;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .edit {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+
+      span {
+        color: #00000080;
+        font-size: 11px;
+        line-height: 1;
+        width: 70px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .input {
+        flex: 1;
+        padding: 0 7px;
+        font-size: 11px;
+        color: #000000e5;
+        height: 22px;
+        border-radius: 5px;
+        border: 1px solid #e6e6e6;
+        background: #ffffff;
+        cursor: default;
+
+        &::placeholder {
+          font-size: 11px;
+          color: #757575;
+        }
+      }
+
+      .color {
+        flex: 1;
+        height: 24px;
+        border-radius: 5px;
+        display: flex;
+        padding: 0 7px;
+        background-color: #f5f5f5;
+      }
+
+      &>div {
+        flex: 1;
+      }
+
+      &:not(:last-child) {
+        margin-bottom: 8px;
+      }
+
+      .setDefaultTheme {
+        flex: 1;
+        button {
+          font-size: 11px;
+          height: 20px;
+          border-radius: 5px;
+          border: 1px solid #e6e6e6;
+          padding: 0 7px;
+          line-height: 1;
+          cursor: pointer;
+
+          &[data-active="true"] {
+            cursor: default;
+            pointer-events: none;
+            color: #ffffff;
+            border-color: var(--mybricks-color-primary);
+            background-color: var(--mybricks-color-primary);
+          }
+        }
+      }
+    }
+  }
+
+  .footer {
+    padding: 8px 16px;
+    display: flex;
+    justify-content: flex-end;
+
+    button {
+      font-size: 11px;
+      border-radius: 5px;
+      font-weight: 450;
+      height: 24px;
+      line-height: 16px;
+      padding: 0 8px;
+      color: #ffffff;
+      background-color: var(--mybricks-color-primary);
+      cursor: pointer;
+    }
+
+    .deleteButton {
+      background-color: #ff4d4f;
+    }
+  }
+}
+
+
+.operateContainer {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+
+  .button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    border-radius: 5px;
+    z-index: 1;
+    cursor: pointer;
+
+    &:hover {
+      background: #0000000d;
+      opacity: 1;
+    }
+
+    &>* {
+      pointer-events: none;
+    }
+
+    &[data-active="true"] {
+      opacity: 1;
+      background: transparent;
+      z-index: 0;
+
+      svg {
+        color: var(--mybricks-color-primary);
+      }
+    }
+  }
+
+  .mask {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}

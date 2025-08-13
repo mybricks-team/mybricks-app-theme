@@ -169,85 +169,6 @@ const ThemeComponent = () => {
 
     return (
       <>
-        {/* <div className={css.themeList}>
-          {themes.length ? themes.map(({ namespace, components }) => {
-            const { title } = namespaceToAllMap[namespace]
-            const expand = themeExpandMap[namespace]
-
-            return (
-              <div key={namespace}>
-                <div className={css.themeItem} onClick={() => onExpandSwitch({ namespace })}>
-                  <div className={css.left}>
-                    <div className={expand ? css.iconExpand : css.icon}>
-                      {ArrorRightOutlined}
-                    </div>
-                    <div className={css.title}>
-                      {title}
-                    </div>
-                  </div>
-                  <div
-                    className={`${css.icon}${!editId && namespace === editNamespace ? ` ${css.iconActive}` : ''}`}
-                    data-mybricks-tip={`{content:'新建组件规范',position:'left'}`}
-                    onClick={(e) => actionOperate(e, { namespace }, 'add')}
-                  >
-                    {PlusOutlined}
-                  </div>
-                </div>
-
-                <div className={`${css.itemPanel}${expand ? ` ${css.itemPanelOpen}` : ''}`}>
-                  {components.length ? components.map(({
-                    id,
-                    title,
-                    themeId,
-                    isDefault,
-                    namespace
-                  }) => {
-                    return (
-                      <div key={id} className={`${css.item}${editId ? (editId === id ? ` ${css.itemActive}` : ``) : ''}`}>
-                        <div className={css.left}>
-                          <div className={css.name}>
-                            <span data-mybricks-tip={title}>{title}</span>
-                          </div>
-                        </div>
-                        <div className={css.right}>
-                          <div
-                            data-mybricks-tip={isDefault ? '默认组件规范' : '设置为默认组件规范'}
-                            className={`${css.action}${isDefault ? ` ${css.actionIsDefault}` : ''}`}
-                            onClick={() => themeOperate({namespace, id}, 'default')}
-                          >
-                            {CircleCheckOutlined}
-                          </div>
-                          <div
-                            data-mybricks-tip='编辑'
-                            className={`${css.action} ${css.actionEdit}`}
-                            onClick={(e) => actionOperate(e, { id, title, themeId, namespace }, 'edit')}
-                          >
-                            {EditOutlined}
-                          </div>
-                          <div
-                            data-mybricks-tip='删除'
-                            className={css.action}
-                            onClick={(e) => actionOperate(e, { id, namespace }, 'delete')}
-                          >
-                            {RemoveOutlined}
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  }) : (
-                    <div className={css.empty}>
-                      无定制组件，请添加
-                    </div>
-                  )}
-                </div>
-              </div>
-            )
-          }) : (
-            <div className={css.empty}>
-              请在画布中添加组件
-            </div>
-          )}
-        </div> */}
         <div className={css.collapse}>
           {themes.length ? (
             <Collapse
@@ -334,7 +255,12 @@ const ThemeComponent = () => {
     )
   }, [themes, themePanelFormData, themeExpandMap])
 
-  return configThemeList
+  return (
+    <div className={css.themeComponent}>
+      <span>组件风格</span>
+      {configThemeList}
+    </div>
+  )
 }
 
 export default ThemeComponent;

@@ -3,6 +3,7 @@ import API from '@mybricks/sdk-for-app/api'
 import ThemeEditor from './theme2'
 import ThemeGlobal from './ThemeGlobal'
 import ThemeComponent from './ThemeComponent'
+import Design from "./Design/Design"
 
 export const EditorContext = createContext({} as {
   editConfig: any;
@@ -47,9 +48,13 @@ export const EditorContext = createContext({} as {
       }>
     }
   };
+  setState: {
+    setOpenDesignDialog: React.Dispatch<React.SetStateAction<boolean>>;
+    [key: string]: any;
+  }
 });
 
-export default ({ editConfig, designerRef, context }, { fileId }) => {
+export default ({ editConfig, designerRef, context, setState }, { fileId }) => {
   if (editConfig && !editConfig.upload) {
     editConfig.upload = async (files: Array<File>): Promise<Array<string>> => {
       const content = files[0]
@@ -68,7 +73,8 @@ export default ({ editConfig, designerRef, context }, { fileId }) => {
   const editorsMap = {
     THEME: ThemeEditor,
     THEMECOMPONENT: ThemeComponent,
-    THEMEGLOBAL: ThemeGlobal
+    THEMEGLOBAL: ThemeGlobal,
+    DESIGN: Design
   }
 
   let editor
@@ -85,7 +91,8 @@ export default ({ editConfig, designerRef, context }, { fileId }) => {
       value: {
         editConfig,
         designer: designerRef.current,
-        context
+        context,
+        setState
       }
     }, createElement(editor))
   }

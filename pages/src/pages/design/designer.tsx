@@ -31,13 +31,17 @@ import comLibAdder from "./configs/comLibAdder";
 import { getInitComLibs } from './configs/utils/getComlibs'
 import { DESIGNER_STATIC_PATH } from "../constants";
 import { getDomainFromPath } from "../utils";
-import { initThemeGlobal } from "./editors/ThemeGlobal"
+// import { initThemeGlobal } from "./editors/ThemeGlobal"
+import { initThemeGlobal } from "./editors/Design/utils";
 import classNames from "classnames";
 import { publish as publish_icon } from './icon/publish'
+import Dialog from "./editors/Design/Variables/Dialog/Dialog";
+import { useUpdateEffect } from './editors/hooks'
 
 // const LOCAL_DATA_KEY = '"--mybricks--'
 
 export default function Designer({ appData }) {
+  const [openDesignDialog, setOpenDesignDialog] = useState(false);
   const [SPADesigner, setSPADesigner] = useState(null)
   const designerRef = useRef<{ 
     dump: () => any, 
@@ -65,6 +69,17 @@ export default function Designer({ appData }) {
       componentType: content.componentType || 'PC'
     }
   }, [])
+
+  const [statesChangeCallBack] = useState({
+    openDesignDialog: new Set<any>(),
+  })
+  const statesRef = useRef({
+    openDesignDialog,
+  })
+
+  useUpdateEffect(() => {
+    Array.from(statesChangeCallBack.openDesignDialog).forEach((fn) => fn(openDesignDialog))
+  }, [openDesignDialog])
 
   const appConfig = useMemo(() => {
     let config = null
@@ -159,10 +174,10 @@ export default function Designer({ appData }) {
 
   const getSaveJson = useCallback(() => {
     const json = designerRef.current.dump()
-    const { themes } = initThemeInfo(traverse(designerRef.current.components.getAll()).reduce((f, s) => [...f, ...s], []), context.theme.themes)
+    // const { themes } = initThemeInfo(traverse(designerRef.current.components.getAll()).reduce((f, s) => [...f, ...s], []), context.theme.themes)
     const { templates } = initTemplateInfo(traverse(designerRef.current.components.getAll()).reduce((f, s) => [...f, ...s], []), context.theme.templates || [])
-    
-    context.theme.themes = themes
+
+    // context.theme.themes = themes
     context.theme.templates = templates
     json.theme = context.theme
     json.componentType = context.componentType
@@ -202,10 +217,41 @@ export default function Designer({ appData }) {
 
     setBeforeunload(false)
 
+    const publishTheme = JSON.parse(JSON.stringify(json.theme))
+
+    const newThemes = [];
+    const hash = {};
+    const namespaceSet = new Set();
+
+    publishTheme.themes.forEach((theme) => {
+      if (!namespaceSet.has(theme.namespace)) {
+        namespaceSet.add(theme.namespace)
+        hash[theme.namespace] = theme.components
+      } else {
+        hash[theme.namespace].push(...theme.components)
+      }
+    })
+
+    namespaceSet.forEach((namespace: string) => {
+      const components = hash[namespace]
+      newThemes.push({
+        namespace,
+        components: hash[namespace].map((component, index) => {
+          return {
+            ...component,
+            isDefault: !index // [TODO] 默认第一个是默认风格
+          }
+        })
+      })
+    })
+
     const res = await axios.post('/api/theme/publish', {
       userId: appData.user.id,
       fileId: appData.fileId,
-      json: json.theme,
+      json: {
+        ...json.theme,
+        themes: newThemes
+      },
       title: appData.fileContent.name
     })
 
@@ -242,6 +288,8 @@ export default function Designer({ appData }) {
 
   const onLoad = useCallback(() => {
     initThemeGlobal({ designer: designerRef.current, context })
+    // setOpenDesignDialog(true)
+    // statesRef.current.openDesignDialog = true
   }, [])
 
   const RenderLocker = useMemo(() => {
@@ -312,24 +360,47 @@ export default function Designer({ appData }) {
         />
       </Toolbar>
       <div className={css.designer}>
-        {SPADesigner && <SPADesigner
-          ref={designerRef}
-          onLoad={onLoad}
-          config={spaDesignerConfig({
-            ctx,
-            appData, 
-            onSaveClick,
-            designerRef, 
-            context 
-          })}
-          onEdit={onEdit}
-        />}
+        {SPADesigner && <>
+            <SPADesigner
+              ref={designerRef}
+              onLoad={onLoad}
+              config={spaDesignerConfig({
+                ctx,
+                appData, 
+                onSaveClick,
+                designerRef, 
+                context,
+                setState: {
+                  setOpenDesignDialog(value) {
+                    statesRef.current.openDesignDialog = value;
+                    setOpenDesignDialog(value);
+                  },
+                  onOpenDesignDialogChange: (fn) => {
+                    fn(statesRef.current.openDesignDialog);
+                    statesChangeCallBack.openDesignDialog.add(fn);
+                  }
+                }
+              })}
+              onEdit={onEdit}
+            />
+            <Dialog
+              open={openDesignDialog}
+              // @ts-ignore
+              designer={designerRef.current}
+              context={context}
+              onClose={() => {
+                setOpenDesignDialog(false)
+                statesRef.current.openDesignDialog = false;
+              }}
+            />
+          
+        </>}
       </div>
     </div>
   )
 }
 
-function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context }) {
+function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context, setState }) {
   const content = appData.fileContent?.content || {}
   const isH5 = content.componentType === 'H5'
   const localComlibs = JSON.parse(localStorage.getItem('MYBRICKS_APP_THEME_COMLIBS'))
@@ -476,45 +547,59 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context })
       width: 400,
       editorAppender(editConfig) {
         editConfig.fontJS = ctx.fontJS
-        return myEditors({ editConfig, designerRef, context }, { fileId: appData.fileId })
+        return myEditors({ editConfig, designerRef, context, setState }, { fileId: appData.fileId })
       },
       items(_, cate0, cate1, cate2) {
-        cate0.title = '组件'
+        cate0.title = "设计"
         cate0.items = [
           {
-            type: 'ThemeComponent'
+            type: "Design"
           },
-        ];
-        cate1.title = "设计规范";
-        cate1.items = [
-          {
-            type: 'ThemeGlobal'
-          },
-        ];
+          // {
+          //   type: "ThemeComponent"
+          // }
+          // {
+          //   type: "ComponentStyles"
+          // }
+        ]
 
-        cate2.title = "其它";
-        cate2.items = [
-          {
-            items: [
-              {
-                title: 'iconfont js链接',
-                type: 'Text',
-                description: '设置iconfont js链接',
-                value: {
-                  get() {
-                    return ctx.fontJS
-                  },
-                  set(context, v: string) {
-                    ctx.fontJS = v
-                    createFromIconfontCN({
-                      scriptUrl: v, // 在 iconfont.cn 上生成
-                    })
-                  },
-                },
-              },
-            ],
-          },
-        ];
+
+        // cate0.title = '组件'
+        // cate0.items = [
+        //   {
+        //     type: 'ThemeComponent'
+        //   },
+        // ];
+        // cate1.title = "设计规范";
+        // cate1.items = [
+        //   {
+        //     type: 'ThemeGlobal'
+        //   },
+        // ];
+
+        // cate2.title = "其它";
+        // cate2.items = [
+        //   {
+        //     items: [
+        //       {
+        //         title: 'iconfont js链接',
+        //         type: 'Text',
+        //         description: '设置iconfont js链接',
+        //         value: {
+        //           get() {
+        //             return ctx.fontJS
+        //           },
+        //           set(context, v: string) {
+        //             ctx.fontJS = v
+        //             createFromIconfontCN({
+        //               scriptUrl: v, // 在 iconfont.cn 上生成
+        //             })
+        //           },
+        //         },
+        //       },
+        //     ],
+        //   },
+        // ];
       },
       editorOptions: mergeEditorOptions([
         !!ctx.setting?.system.config?.isPureIntranet &&
@@ -523,6 +608,7 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context })
       ]),
     },
     com: {
+      usePreviewImage: true,
       env: {
         i18n(title) {
           return title
