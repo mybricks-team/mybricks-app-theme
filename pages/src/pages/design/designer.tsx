@@ -126,13 +126,14 @@ export default function Designer({ appData }) {
   }, [])
 
   useLayoutEffect(() => {
-    getInitComLibs(appData)
-    .then(async ({ comlibs, latestComlibs }) => {
-      const newComlibs = comlibs
+    appData.getInitComLibs({
+      localComlibs: [],
+      currentComlibs: appData.fileContent?.content?.comlibs,
+    }).then(({ comlibs, latestComlibs }) => {
+      const hasAIComlib = comlibs.some(lib => lib.namespace === 'mybricks.ai-comlib-pc');
 
-      setCtx((pre) => ({ ...pre, comlibs: newComlibs, latestComlibs }))
-    })
-    .finally(loadDesigner)
+      setCtx((pre) => ({ ...pre, comlibs, hasAIComlib, latestComlibs }))
+    }).finally(loadDesigner)
   }, [])
 
   //页面刷新的时候，添加fontJS资源
@@ -501,24 +502,27 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context, s
       }),
       // toolsPlugin(),
     ],
-    ...(ctx.hasMaterialApp && !localComlibs && !isH5
-      ? {
-          comLibAdder: comLibAdder(ctx),
-        }
-      : {}),
-    comLibLoader(params) {
-      if (localComlibs || isH5) {
-        return new Promise((resolve) => {
-          if (localComlibs) {
-            resolve(localComlibs)
-          } else if (isH5) {
-            resolve(['public/comlibs/h5.js'])
-          }
-        })
-      }
-
-      return comlibLoader(ctx)(params)
-    },
+    // ...(ctx.hasMaterialApp && !localComlibs && !isH5
+    //   ? {
+    //       comLibAdder: comLibAdder(ctx),
+    //     }
+    //   : {}),
+    // comLibLoader(params) {
+    //   if (localComlibs || isH5) {
+    //     return new Promise((resolve) => {
+    //       if (localComlibs) {
+    //         resolve(localComlibs)
+    //       } else if (isH5) {
+    //         resolve(['public/comlibs/h5.js'])
+    //       }
+    //     })
+    //   }
+    comLibAdder: appData.comLibAdder(ctx),
+    comLibLoader: appData.comLibLoader({
+      comlibs: ctx.comlibs
+    }),
+    //   return comlibLoader(ctx)(params)
+    // },
     // comLibLoader() {
     //   return new Promise((resolve) => {
         
@@ -648,7 +652,7 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context, s
       },
       theme:{
         css:[
-          'public/antd-4.21.6/antd.variable.min.css'
+          // 'public/antd-4.21.6/antd.variable.min.css'
         ],
       },
       toolbarContainer: '#sdk_toolbar_center',
