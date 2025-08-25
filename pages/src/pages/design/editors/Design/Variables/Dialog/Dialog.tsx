@@ -1188,7 +1188,8 @@ const VariableTable = (props) => {
         const { key, name, value } = config;
         if (!dataSource[index]) {
           dataSource[index] = {
-            _variableName: isSystem ? SYSTEM_VARIABLE_NAME_MAP[key] : name,
+            _variableName: name,
+            // _variableName: isSystem ? SYSTEM_VARIABLE_NAME_MAP[key] : name,
             key,
             [variable.key]: value,
             _object: [{
@@ -1322,7 +1323,7 @@ const TableColumnName = (props) => {
         [css.tableColumnVariableNameEditAble]: editAble,
       })}
       onClick={() => {
-        if (!record._isSystem) {
+        if (!record._isSystem || true) {
           if (!editAble) {
             inputRef.current.select();
             setEditAble(true);
@@ -1336,7 +1337,7 @@ const TableColumnName = (props) => {
     >
       <div className={css.title}>
         {PaletteIcon}
-        {record._isSystem ? (
+        {record._isSystem && false ? (
           <span>{form.name}</span>
         ) : (
           <input

@@ -1,6 +1,7 @@
 import { getDefaultToken, antdV4, generateColorCssVarListUseForMyBricksEditor } from "@mybricks/theme-token";
 import { convertCamelToHyphen, convertHyphenToCamel } from "./string";
 import { uuid } from "../../utils"
+import { SYSTEM_VARIABLE_NAME_MAP } from "../Variables/Dialog/constants"
 
 const MYBRICKS_PREFIXCLS = "mb";
 
@@ -110,6 +111,12 @@ export const initThemeGlobal = ({ designer, context }) => {
 
     context.theme.variables.forEach((variable) => {
       variable.title = variable.key;
+      const systemTheme = variable.variables.find((v) => v.id = "mybricks@theme");
+      systemTheme.configs.forEach((config) => {
+        if (!config.name) {
+          config.name = SYSTEM_VARIABLE_NAME_MAP[config.key]
+        }
+      })
     })
   }
 
