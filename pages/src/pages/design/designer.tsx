@@ -6,39 +6,25 @@ import React, {
   useRef,
   useLayoutEffect
 } from 'react'
-
 import axios from 'axios'
 import moment from 'moment'
-import { message, Button } from 'antd'
+import { message } from 'antd'
 import API from '@mybricks/sdk-for-app/api'
-// import toolsPlugin from '@mybricks/plugin-tools'
 import versionPlugin from 'mybricks-plugin-version'
 import { Locker, Toolbar } from '@mybricks/sdk-for-app/ui'
-
 import myEditors from './editors'
-import { traverse, initThemeInfo, initTemplateInfo } from './editors/theme/view/config'
-
 import css from './designer.less'
 import notePlugin from '@mybricks/plugin-note'
-import upload from './utils/upload'
 import searchUser from './utils/searchUser'
 import { createFromIconfontCN } from '@ant-design/icons'
-
 import { DESIGN_MATERIAL_EDITOR_OPTIONS, mergeEditorOptions, PURE_INTERNET_EDITOR_OPTIONS } from "./editor-options";
-
-import comlibLoader from "./configs/comLibLoader";
-import comLibAdder from "./configs/comLibAdder";
-import { getInitComLibs } from './configs/utils/getComlibs'
 import { DESIGNER_STATIC_PATH } from "../constants";
 import { getDomainFromPath } from "../utils";
-// import { initThemeGlobal } from "./editors/ThemeGlobal"
 import { initThemeGlobal } from "./editors/Design/utils";
 import classNames from "classnames";
 import { publish as publish_icon } from './icon/publish'
 import Dialog from "./editors/Design/Variables/Dialog/Dialog";
 import { useUpdateEffect } from './editors/hooks'
-
-// const LOCAL_DATA_KEY = '"--mybricks--'
 
 export default function Designer({ appData }) {
   const [openDesignDialog, setOpenDesignDialog] = useState(false);
@@ -57,7 +43,6 @@ export default function Designer({ appData }) {
   const [beforeunload, setBeforeunload] = useState(false)
   const [saveTip, setSaveTip] = useState('')
   const [saveLoading, setSaveLoading] = useState(false)
-  const [publishLoading, setPublishLoading] = useState(false)
   const context = useMemo(() => {
     const content = appData.fileContent.content
     return {
@@ -176,10 +161,10 @@ export default function Designer({ appData }) {
   const getSaveJson = useCallback(() => {
     const json = designerRef.current.dump()
     // const { themes } = initThemeInfo(traverse(designerRef.current.components.getAll()).reduce((f, s) => [...f, ...s], []), context.theme.themes)
-    const { templates } = initTemplateInfo(traverse(designerRef.current.components.getAll()).reduce((f, s) => [...f, ...s], []), context.theme.templates || [])
+    // const { templates } = initTemplateInfo(traverse(designerRef.current.components.getAll()).reduce((f, s) => [...f, ...s], []), context.theme.templates || [])
 
     // context.theme.themes = themes
-    context.theme.templates = templates
+    // context.theme.templates = templates
     json.theme = context.theme
     json.componentType = context.componentType
     json.fontJS = ctx.fontJS
@@ -212,7 +197,6 @@ export default function Designer({ appData }) {
   }, [ctx, operable])
 
   const onPublishClick = useCallback(async () => {
-    setPublishLoading(true)
     const json = getSaveJson()
     save({ name: appData.fileContent.name, content: JSON.stringify(json) }, true)
 
@@ -269,8 +253,6 @@ export default function Designer({ appData }) {
         duration: 2,
       })
     }
-
-    setPublishLoading(false)
   }, [ctx, operable])
 
   useEffect(() => {
@@ -289,8 +271,6 @@ export default function Designer({ appData }) {
 
   const onLoad = useCallback(() => {
     initThemeGlobal({ designer: designerRef.current, context })
-    // setOpenDesignDialog(true)
-    // statesRef.current.openDesignDialog = true
   }, [])
 
   const RenderLocker = useMemo(() => {
@@ -317,11 +297,6 @@ export default function Designer({ appData }) {
           onClick={onSaveClick}
           dotTip={beforeunload}
         />
-        {/* <Toolbar.Button
-          disabled={!operable}
-          loading={publishLoading}
-          onClick={onPublishClick}
-        >发布</Toolbar.Button> */}
         <div
           data-mybricks-tip={`{content:'发布',position:'bottom'}`} 
           className={
@@ -559,27 +534,7 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context, s
           {
             type: "Design"
           },
-          // {
-          //   type: "ThemeComponent"
-          // }
-          // {
-          //   type: "ComponentStyles"
-          // }
         ]
-
-
-        // cate0.title = '组件'
-        // cate0.items = [
-        //   {
-        //     type: 'ThemeComponent'
-        //   },
-        // ];
-        // cate1.title = "设计规范";
-        // cate1.items = [
-        //   {
-        //     type: 'ThemeGlobal'
-        //   },
-        // ];
 
         // cate2.title = "其它";
         // cate2.items = [
@@ -651,9 +606,7 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context, s
         ]
       },
       theme:{
-        css:[
-          // 'public/antd-4.21.6/antd.variable.min.css'
-        ],
+        css:[],
       },
       toolbarContainer: '#sdk_toolbar_center',
     }

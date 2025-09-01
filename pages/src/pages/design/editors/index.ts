@@ -1,8 +1,5 @@
 import { createContext, createElement } from "react";
 import API from '@mybricks/sdk-for-app/api'
-import ThemeEditor from './theme2'
-import ThemeGlobal from './ThemeGlobal'
-import ThemeComponent from './ThemeComponent'
 import Design from "./Design/Design"
 
 export const EditorContext = createContext({} as {
@@ -71,9 +68,6 @@ export default ({ editConfig, designerRef, context, setState }, { fileId }) => {
   }
 
   const editorsMap = {
-    THEME: ThemeEditor,
-    THEMECOMPONENT: ThemeComponent,
-    THEMEGLOBAL: ThemeGlobal,
     DESIGN: Design
   }
 
