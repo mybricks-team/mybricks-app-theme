@@ -57,7 +57,6 @@
     "@mybricks/plugin-tools": "^1.0.17",
     "@mybricks/render-web": "1.1.75",
     "@mybricks/sdk-for-app": "^1.0.69",
-    "@mybricks/theme-token": "^0.0.1",
     "antd": "^4.23.6",
     "antd5": "npm:antd@latest",
     "classnames": "^2.3.1",

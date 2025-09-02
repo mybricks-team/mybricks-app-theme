@@ -21,6 +21,7 @@ import { DESIGN_MATERIAL_EDITOR_OPTIONS, mergeEditorOptions, PURE_INTERNET_EDITO
 import { DESIGNER_STATIC_PATH } from "../constants";
 import { getDomainFromPath } from "../utils";
 import { initThemeGlobal } from "./editors/Design/utils";
+import { initTheme } from './editors/Design/themeToken'
 import classNames from "classnames";
 import { publish as publish_icon } from './icon/publish'
 import Dialog from "./editors/Design/Variables/Dialog/Dialog";
@@ -46,11 +47,7 @@ export default function Designer({ appData }) {
   const context = useMemo(() => {
     const content = appData.fileContent.content
     return {
-      theme: content.theme || {
-        themes: [],
-        variables: [],
-        templates: []
-      },
+      theme: initTheme(content.theme),
       componentType: content.componentType || 'PC'
     }
   }, [])
@@ -197,6 +194,11 @@ export default function Designer({ appData }) {
   }, [ctx, operable])
 
   const onPublishClick = useCallback(async () => {
+    const close = message.loading({
+      key: 'publish',
+      content: '发布中...',
+      duration: 0,
+    })
     const json = getSaveJson()
     save({ name: appData.fileContent.name, content: JSON.stringify(json) }, true)
 
@@ -246,8 +248,8 @@ export default function Designer({ appData }) {
         content: '发布成功',
         duration: 2,
       })
-
     } else {
+      close()
       message.error({
         content: res.data.message || '发布失败',
         duration: 2,

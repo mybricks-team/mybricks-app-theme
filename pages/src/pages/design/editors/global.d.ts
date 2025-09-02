@@ -12,4 +12,5 @@ interface Window {
 			resetValue: string
 		}>
 	}>
+	MYBRICKS_THEME_PACKAGE_VARIABLES: any
 }

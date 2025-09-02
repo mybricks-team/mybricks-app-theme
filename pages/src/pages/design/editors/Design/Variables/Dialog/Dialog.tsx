@@ -5,8 +5,8 @@ import { Table, ColorPicker, ConfigProvider, message } from "antd5";
 import validateColor from "validate-color";
 import tc from 'tinycolor2';
 import { AddIcon, CloseIcon, PaletteIcon, EditTriggerButtonIcon } from "../../Components";
-import { SYSTEM_VARIABLE_NAME_MAP, PRESET_COLORS, MYBRICKS_PREFIXCLS } from "./constants";
-import { initRandomCssVariable, handleThemeChange } from "../../utils";
+import { PRESET_COLORS } from "./constants";
+import { initRandomCssVariable, activeThemeChange, variableValueChange, variableDelete, setVariablesToWindow, variableKeyChange } from "../../utils";
 import css from "./Dialog.less";
 
 /**
@@ -75,15 +75,16 @@ export default Dialog;
 
 const initSwitchList = (params) => {
   const { context } = params;
-  const titleMap = {
-    "mybricks@theme": "系统",
-    "custom@theme": "自定义"
-  }
+  // const titleMap = {
+  //   "mybricks@theme": "系统",
+  //   "custom@theme": "自定义"
+  // }
 
-  return context.theme.variables[0].variables.map(({ id, configs }, index) => {
+  return context.theme.variables[0].variables.map(({ id, title, configs }, index) => {
     const show = index ? false : true;
     return {
-      title: titleMap[id],
+      title,
+      // title: titleMap[id],
       key: id,
       variableCount: configs.length,
       show,
@@ -370,10 +371,29 @@ const Modal = (props: DialogProps) => {
     }
   }, [])
 
-  const themeChange = useCallback(() => {
-    setTimeout(() => {
-      handleThemeChange({ designer, context, mybricksPrefixCls: MYBRICKS_PREFIXCLS })
-    }, 0)
+  const themeChange = useCallback(({ type, params }) => {
+    switch (type) {
+      case "activeThemeChange":
+        activeThemeChange({ designer, context });
+        break
+      case "setVariablesToWindow":
+        setVariablesToWindow({ context })
+        break
+      case "variableKeyChange":
+        variableKeyChange({ designer, params })
+        break
+      case "variableValueChange":
+        const active = context.theme.variables.find((variable) => variable.active)
+        if (active.key === params.themeKey) {
+          variableValueChange({ designer, variable: params })
+        }
+        break
+      default:
+        break
+    }
+    // setTimeout(() => {
+    //   handleThemeChange({ designer, context, mybricksPrefixCls: MYBRICKS_PREFIXCLS })
+    // }, 0)
   }, [])
 
   const tableColumns = useMemo(() => {
@@ -411,9 +431,10 @@ const Modal = (props: DialogProps) => {
 
   const addVariable = useCallback(() => {
     const active = switchList.find(({ active }) => active);
+    const randomCssVariable = initRandomCssVariable()
     context.theme.variables.forEach(({ variables }) => {
       const variable = variables.find(({ id }) => id === active.key);
-      variable.configs.push(initRandomCssVariable())
+      variable.configs.push(randomCssVariable)
     })
 
     setSwitchList(switchList.map((switchItem) => {
@@ -423,7 +444,7 @@ const Modal = (props: DialogProps) => {
       }
     }))
 
-    themeChange()
+    variableValueChange({ designer, variable: randomCssVariable })
   }, [switchList])
 
   const deleteVariable = useCallback((record) => {
@@ -445,7 +466,7 @@ const Modal = (props: DialogProps) => {
       }
     }))
 
-    themeChange()
+    variableDelete({ designer, key: record.key })
   }, [switchList])
 
   const deleteTheme = useCallback((record) => {
@@ -460,12 +481,15 @@ const Modal = (props: DialogProps) => {
 
     if (deleteVariable.active) {
       variables[0].active = true;
+      setActiveThemeKey(variables[0].key)
     }
 
     context.theme.variables = variables;
+    if (deleteVariable.active) {
+      activeThemeChange({ designer, context });
+    }
     setEditThemeContext(undefined);
     setThemeList(initThemeList({ context }));
-    themeChange();
   }, [])
 
   const divRef = useRef<HTMLDivElement>(null);
@@ -976,7 +1000,7 @@ const EditTheme = (props) => {
                   theme.variables.forEach((variable) => {
                     variable.active = variable.key === form.title;
                   })
-                  props.themeChange();
+                  props.themeChange({ type: "activeThemeChange" });
                 }
               }}
             >
@@ -1046,51 +1070,51 @@ const EditVariable = (props) => {
           {CloseIcon}
         </button>
       </div>
-      {!context?.record._isSystem ? (
-        <div className={css.content}>
-          <div className={css.edit}>
-            <span>
-              名称
-            </span>
-            <input
-              className={css.input}
-              placeholder="请输入变量名称"
-              value={form.variableName}
-              onChange={(e) => {
+       <div className={css.content}>
+        <div className={css.edit}>
+          <span>
+            名称
+          </span>
+          <input
+            className={css.input}
+            placeholder="请输入变量名称"
+            value={form.variableName}
+            onChange={(e) => {
+              setForm((form) => {
+                return {
+                  ...form,
+                  variableName: e.target.value.trim()
+                }
+              })
+            }}
+            onBlur={() => {
+              if (!context) {
+                return
+              }
+              if (!form.variableName) {
                 setForm((form) => {
                   return {
                     ...form,
-                    variableName: e.target.value.trim()
+                    variableName: form._variableName
                   }
                 })
-              }}
-              onBlur={() => {
-                if (!context) {
-                  return
-                }
-                if (!form.variableName) {
-                  setForm((form) => {
-                    return {
-                      ...form,
-                      variableName: form._variableName
-                    }
-                  })
-                } else {
-                  setForm((form) => {
-                    return {
-                      ...form,
-                      _variableName: form.variableName
-                    }
-                  })
-                  context.record._state.setName(form.variableName);
-                  Object.entries(context.record._originalObject).forEach(([, value]: any) => {
-                    value.name = form.variableName;
-                  })
-                  themeChange()
-                }
-              }}
-            />
-          </div>
+              } else {
+                setForm((form) => {
+                  return {
+                    ...form,
+                    _variableName: form.variableName
+                  }
+                })
+                context.record._state.setName(form.variableName);
+                Object.entries(context.record._originalObject).forEach(([, value]: any) => {
+                  value.name = form.variableName;
+                })
+                themeChange({ type: "setVariablesToWindow"});
+              }
+            }}
+          />
+        </div>
+        {!context?.record._isSystem ? (
           <div className={css.edit}>
             <span>
               css变量
@@ -1119,6 +1143,7 @@ const EditVariable = (props) => {
                     }
                   })
                 } else {
+                  const previousKey = form._cssKey;
                   setForm((form) => {
                     return {
                       ...form,
@@ -1128,13 +1153,16 @@ const EditVariable = (props) => {
                   Object.entries(context.record._originalObject).forEach(([, value]: any) => {
                     value.key = form.cssKey;
                   })
-                  themeChange();
+                  themeChange({ type: "variableKeyChange", params: {
+                    previousKey,
+                    key: form.cssKey,
+                  }});
                 }
               }}
             />
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
       <div className={css.content}>
         <div className={css.editContainerTitle}>变量值</div>
         {context?.record._object.map(({ title, key }) => {
@@ -1323,62 +1351,57 @@ const TableColumnName = (props) => {
         [css.tableColumnVariableNameEditAble]: editAble,
       })}
       onClick={() => {
-        if (!record._isSystem || true) {
-          if (!editAble) {
-            inputRef.current.select();
-            setEditAble(true);
-          } else {
-            inputRef.current.focus();
-            const length = inputRef.current.value.length;
-            inputRef.current.setSelectionRange(length, length);
-          }
+        if (!editAble) {
+          inputRef.current.select();
+          setEditAble(true);
+        } else {
+          inputRef.current.focus();
+          const length = inputRef.current.value.length;
+          inputRef.current.setSelectionRange(length, length);
         }
       }}
     >
       <div className={css.title}>
         {PaletteIcon}
-        {record._isSystem && false ? (
-          <span>{form.name}</span>
-        ) : (
-          <input
-            ref={inputRef}
-            placeholder="请输入变量名称"
-            value={form.name}
-            onChange={(e) => {
+        <input
+          ref={inputRef}
+          placeholder="请输入变量名称"
+          value={form.name}
+          onChange={(e) => {
+            setForm((form) => {
+              return {
+                ...form,
+                name: e.target.value.trim()
+              }
+            })
+          }}
+          onBlur={() => {
+            if (!record) {
+              return
+            }
+            if (!form.name) {
               setForm((form) => {
                 return {
                   ...form,
-                  name: e.target.value.trim()
+                  name: form._name
                 }
               })
-            }}
-            onBlur={() => {
-              if (!record) {
-                return
-              }
-              if (!form.name) {
-                setForm((form) => {
-                  return {
-                    ...form,
-                    name: form._name
-                  }
-                })
-              } else {
-                setForm((form) => {
-                  return {
-                    ...form,
-                    _name: form.name
-                  }
-                })
+            } else {
+              setForm((form) => {
+                return {
+                  ...form,
+                  _name: form.name
+                }
+              })
 
-                Object.entries(record._originalObject).forEach(([, value]: any) => {
-                  value.name = form.name;
-                })
-                themeChange()
-              }
-            }}
-          />
-        )}
+              Object.entries(record._originalObject).forEach(([, value]: any) => {
+                value.name = form.name;
+              })
+
+              themeChange({ type: "setVariablesToWindow" })
+            }
+          }}
+        />
       </div>
 
       <div className={css.operateContainer}>
@@ -1508,7 +1531,11 @@ const TableColumnColor = (props) => {
           setDraft(hex);
           props.record._originalObject[props.valueKey].value = hex;
           props.record._state[props.valueKey].setValue(hex);
-          themeChange();
+          themeChange({ type: "variableValueChange", params: {
+            key: props.record._originalObject[props.valueKey].key,
+            value: hex,
+            themeKey: props.valueKey
+          }})
         }}
         value={color}
         onOpenChange={(open) => {
@@ -1535,7 +1562,11 @@ const TableColumnColor = (props) => {
             setDraft(hex);
             props.record._originalObject[props.valueKey].value = hex;
             props.record._state[props.valueKey].setValue(hex);
-            themeChange();
+            themeChange({ type: "variableValueChange", params: {
+              key: props.record._originalObject[props.valueKey].key,
+              value: hex,
+              themeKey: props.valueKey
+            }})
           } else {
             setDraft(color);
           }
@@ -1575,7 +1606,11 @@ const EditorColor = (props) => {
           setDraft(hex);
           props.record._originalObject[props.valueKey].value = hex;
           props.record._state[props.valueKey].setValue(hex);
-          themeChange();
+          themeChange({ type: "variableValueChange", params: {
+            key: props.record._originalObject[props.valueKey].key,
+            value: hex,
+            themeKey: props.valueKey
+          }})
         }}
         value={color}
       />
@@ -1591,7 +1626,11 @@ const EditorColor = (props) => {
             setDraft(hex);
             props.record._originalObject[props.valueKey].value = hex;
             props.record._state[props.valueKey].setValue(hex);
-            themeChange();
+            themeChange({ type: "variableValueChange", params: {
+              key: props.record._originalObject[props.valueKey].key,
+              value: hex,
+              themeKey: props.valueKey
+            }})
           } else {
             setDraft(color);
           }
