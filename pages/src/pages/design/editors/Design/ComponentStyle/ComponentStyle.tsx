@@ -999,76 +999,84 @@ const BasicDialog = (props) => {
 }
 
 const uploadUrl = (config, next) => {
-  if (!config?.dom) {
-    return;
-  }
-  const dom = config.dom;
-  const copyDom = dom.cloneNode(true)
-  copyDom.style.top = '0px'
-  copyDom.style.left = '0px'
-  copyDom.style.right = '0px'
-  copyDom.style.bottom = '0px'
-  copyDom.style.position = 'relative'
-  copyDom.style.width = dom.offsetWidth
-  copyDom.style.height = dom.offsetHeight
-  copyDom.style.zIndex = '-1'
+  API.Upload.toOss({
+    content: decodeURIComponent(config.previewImage).replace('data:image/svg+xml;charset=utf-8,', ''),
+    folderPath: '/theme_pack_app',
+    fileName: `${uuid()}.svg`
+  }).then((value: any) => {
+    next(value.url)
+  }).catch((error) => {})
 
-  const domParent = dom.parentElement
-  domParent.appendChild(copyDom)
+  // if (!config?.dom) {
+  //   return;
+  // }
+  // const dom = config.dom;
+  // const copyDom = dom.cloneNode(true)
+  // copyDom.style.top = '0px'
+  // copyDom.style.left = '0px'
+  // copyDom.style.right = '0px'
+  // copyDom.style.bottom = '0px'
+  // copyDom.style.position = 'relative'
+  // copyDom.style.width = dom.offsetWidth
+  // copyDom.style.height = dom.offsetHeight
+  // copyDom.style.zIndex = '-1'
 
-  domToImage.toSvg(copyDom, {
-    filter: (dom) => {
-      const className = dom.className
-      if (typeof className === 'string' && className.startsWith('append-')) {
-        return false
-      }
-      return true
-    }
-  })
-    .then((dataUrl) => {
-      // const { id, styleAry } = themeIdToThemeMap[option.value]
-      const id = config.id;
-      const styleAry = config.model.css;
-      let innerText = '';
+  // const domParent = dom.parentElement
+  // domParent.appendChild(copyDom)
 
-      // 这里需要将变量转换为具体的值设置，否则生成svg后样式丢失，变量没必要写入svg
-      const cssVarToValueMap = getCssVarToValueMap()
+  // domToImage.toSvg(copyDom, {
+  //   filter: (dom) => {
+  //     const className = dom.className
+  //     if (typeof className === 'string' && className.startsWith('append-')) {
+  //       return false
+  //     }
+  //     return true
+  //   }
+  // })
+  //   .then((dataUrl) => {
+  //     // const { id, styleAry } = themeIdToThemeMap[option.value]
+  //     const id = config.id;
+  //     const styleAry = config.model.css;
+  //     let innerText = '';
 
-      styleAry?.forEach(({ css, selector, global }) => {
-        if (selector === ':root') {
-          selector = '> *:first-child'
-        }
-        if (Array.isArray(selector)) {
-          selector.forEach((selector) => {
-            innerText = innerText + getStyleInnerText({ id, css, selector, global, cssVarToValueMap })
-          })
-        } else {
-          innerText = innerText + getStyleInnerText({ id, css, selector, global, cssVarToValueMap })
-        }
-      })
+  //     // 这里需要将变量转换为具体的值设置，否则生成svg后样式丢失，变量没必要写入svg
+  //     const cssVarToValueMap = getCssVarToValueMap()
 
-      API.Upload.toOss({
-        content: dataUrl.replace('data:image/svg+xml;charset=utf-8,', '').replace(`<foreignObject`, `<style>${innerText}</style><foreignObject`),
-        folderPath: '/theme_pack_app',
-        fileName: `${uuid()}.svg`
-      }).then((value: any) => {
-        // result.previewUrl = value.url
-        // message.destroy(messageKey)
-        // setSaveLoading(false)
-        // onOk(result)
-        next(value.url)
-      }).catch((error) => {
-        // console.error('预览图上传失败: ', error)
-        // setSaveLoading(false)
-        // onOk(result)
-      })
-    })
-    .catch((error) => {
+  //     styleAry?.forEach(({ css, selector, global }) => {
+  //       if (selector === ':root') {
+  //         selector = '> *:first-child'
+  //       }
+  //       if (Array.isArray(selector)) {
+  //         selector.forEach((selector) => {
+  //           innerText = innerText + getStyleInnerText({ id, css, selector, global, cssVarToValueMap })
+  //         })
+  //       } else {
+  //         innerText = innerText + getStyleInnerText({ id, css, selector, global, cssVarToValueMap })
+  //       }
+  //     })
 
-    })
-    .finally(() => {
-      domParent.removeChild(copyDom)
-    })
+  //     API.Upload.toOss({
+  //       content: dataUrl.replace('data:image/svg+xml;charset=utf-8,', '').replace(`<foreignObject`, `<style>${innerText}</style><foreignObject`),
+  //       folderPath: '/theme_pack_app',
+  //       fileName: `${uuid()}.svg`
+  //     }).then((value: any) => {
+  //       // result.previewUrl = value.url
+  //       // message.destroy(messageKey)
+  //       // setSaveLoading(false)
+  //       // onOk(result)
+  //       next(value.url)
+  //     }).catch((error) => {
+  //       // console.error('预览图上传失败: ', error)
+  //       // setSaveLoading(false)
+  //       // onOk(result)
+  //     })
+  //   })
+  //   .catch((error) => {
+
+  //   })
+  //   .finally(() => {
+  //     domParent.removeChild(copyDom)
+  //   })
 }
 
 function getCssVarToValueMap() {
