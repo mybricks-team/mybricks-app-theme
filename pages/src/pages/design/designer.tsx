@@ -271,6 +271,16 @@ export default function Designer({ appData }) {
     setBeforeunload(true);
   }, [])
 
+  const onMessage = useCallback((type, msg) => {
+    message.destroy()
+    message[type](msg)
+  }, [])
+
+  const onError = useCallback((ex: any) => {
+    console.error(ex)
+    onMessage('error', ex.message)
+  }, [])
+
   const onLoad = useCallback(() => {
     initThemeGlobal({ designer: designerRef.current, context })
   }, [])
@@ -360,6 +370,8 @@ export default function Designer({ appData }) {
                 }
               })}
               onEdit={onEdit}
+              onMessage={onMessage}
+              _onError_={onError}
             />
             <Dialog
               open={openDesignDialog}
