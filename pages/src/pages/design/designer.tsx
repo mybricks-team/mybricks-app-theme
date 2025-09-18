@@ -579,13 +579,13 @@ function spaDesignerConfig ({ ctx, appData, onSaveClick, designerRef, context, s
     },
     geoView: {
       width: 600,
-      layout: 'absolute',
+      layout: 'smart',
       scenes: {
         adder: [
           {
             type: 'normal',
             title: '普通场景',
-            layout: 'absolute'
+            layout: 'smart'
           },
           {
             type: 'popup',
