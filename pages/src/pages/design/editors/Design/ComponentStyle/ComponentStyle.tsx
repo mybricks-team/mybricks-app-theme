@@ -1,4 +1,4 @@
-import React, { useContext, useState, useMemo, useEffect, useCallback, useRef, createContext } from "react";
+import React, { useContext, useState, useMemo, useEffect, useCallback, useRef, createContext, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 import classNames from "classnames";
 import { message, Collapse } from "antd5";
@@ -168,8 +168,9 @@ const ComponentStyle = () => {
                   })
                 },
                 style: {
-                  top: rect.bottom,
-                  right: window.innerWidth - rect.right,
+                  rect,
+                  // top: rect.bottom,
+                  // right: window.innerWidth - rect.right,
                   width: "fit-content",
                   minWidth: 100,
                 },
@@ -189,9 +190,9 @@ const ComponentStyle = () => {
           })}
         </div>
       </ComponentStyleContext.Provider>
-      <BasicDialog context={addCategoryContext}>
-        {addCategoryContext && <AddCategory context={addCategoryContext} />}
-      </BasicDialog>
+      {addCategoryContext && <BasicDialog context={addCategoryContext}>
+        <AddCategory context={addCategoryContext} />
+      </BasicDialog>}
     </div>
   )
 }
@@ -263,8 +264,9 @@ const ThemeItem = (props) => {
                   },
                   theme,
                   style: {
-                    top: rect.bottom - rect.height,
-                    right: window.innerWidth - rect.right + rect.width,
+                    rect,
+                    // top: rect.bottom - rect.height,
+                    // right: window.innerWidth - rect.right + rect.width,
                   },
                   onClose() {
                     currentTarget.removeAttribute("data-active");
@@ -298,8 +300,9 @@ const ThemeItem = (props) => {
                   title: `添加「${form.title}」组件风格`,
                   namespace: com.namespace,
                   style: {
-                    top: rect.bottom - rect.height,
-                    right: window.innerWidth - rect.right + rect.width,
+                    rect,
+                    // top: rect.bottom - rect.height,
+                    // right: window.innerWidth - rect.right + rect.width,
                   },
                   onClose() {
                     currentTarget.removeAttribute("data-active");
@@ -354,12 +357,12 @@ const ThemeItem = (props) => {
           )
         })}
       </div>
-      <BasicDialog context={editContext}>
-        {editContext && <EditCategory context={editContext} deleteTheme={deleteTheme} />}
-      </BasicDialog>
-      <BasicDialog context={addStyleContext}>
-        {addStyleContext && <AddStyle context={addStyleContext} />}
-      </BasicDialog>
+      {editContext && <BasicDialog context={editContext}>
+        <EditCategory context={editContext} deleteTheme={deleteTheme} />
+      </BasicDialog>}
+      {addStyleContext && <BasicDialog context={addStyleContext}>
+        <AddStyle context={addStyleContext} />
+      </BasicDialog>}
     </div>
   )
 }
@@ -411,8 +414,9 @@ const Components = (props) => {
                 title: `编辑「${component.title}」组件风格`,
                 namespace: com.namespace,
                 style: {
-                  top: rect.bottom - rect.height,
-                  right: window.innerWidth - rect.right + rect.width,
+                  rect,
+                  // top: rect.bottom - rect.height,
+                  // right: window.innerWidth - rect.right + rect.width,
                 },
                 component,
                 record: {
@@ -583,9 +587,9 @@ const Components = (props) => {
         </button>
         <div className={css.mask} />
       </div> */}
-      <BasicDialog context={addStyleContext}>
-        {addStyleContext && <AddStyle context={addStyleContext} deleteComponents={deleteComponents} />}
-      </BasicDialog>
+      {addStyleContext && <BasicDialog context={addStyleContext}>
+        <AddStyle context={addStyleContext} deleteComponents={deleteComponents} />
+      </BasicDialog>}
     </div>
   )
 }
@@ -692,8 +696,9 @@ const AddStyle = (props) => {
               setThemeSelectContext({
                 style: {
                   width: rect.width,
-                  top: rect.bottom,
-                  right: window.innerWidth - rect.right
+                  rect,
+                  // top: rect.bottom,
+                  // right: window.innerWidth - rect.right
                 },
                 onClose() {
                   currentTarget.removeAttribute("data-active");
@@ -748,14 +753,12 @@ const AddStyle = (props) => {
       //   </button>
       // </div>
       }
-      <BasicDialog context={themeSelectContext} container={themeEditContainerRef.current}>
-        {themeSelectContext && (
-          <ThemeStyleSelect
-            context={themeSelectContext}
-            themeOptions={themeOptions}
-          />
-        )}
-      </BasicDialog>
+      {themeSelectContext && <BasicDialog context={themeSelectContext} container={themeEditContainerRef.current}>
+        <ThemeStyleSelect
+          context={themeSelectContext}
+          themeOptions={themeOptions}
+        />
+      </BasicDialog>}
     </>
   )
 }
@@ -806,8 +809,9 @@ const AddCategory = (props) => {
                 type: "add",
                 title: `添加「${com.title}」分类`,
                 style: {
-                  top: parentRect.bottom - parentRect.height,
-                  right: window.innerWidth - parentRect.right + parentRect.width,
+                  rect: parentRect
+                  // top: parentRect.bottom - parentRect.height,
+                  // right: window.innerWidth - parentRect.right + parentRect.width,
                 },
                 onClose() {
                   currentTarget.removeAttribute("data-active");
@@ -831,9 +835,9 @@ const AddCategory = (props) => {
           请先在画布中添加组件
         </div>
       )}
-      <BasicDialog context={createContext} container={addCategoryContainerRef.current}>
-        {createContext && <EditCategory context={createContext} />}
-      </BasicDialog>
+      {createContext && <BasicDialog context={createContext} container={addCategoryContainerRef.current}>
+        <EditCategory context={createContext} />
+      </BasicDialog>}
     </div>
   )
 }
@@ -971,14 +975,30 @@ const BasicDialog = (props) => {
     if (ref.current && !ref.current.contains(e.target)) {
       context.onClose();
     }
-  }, [context])
+  }, [])
   useEffect(() => {
-    if (context) {
-      window.addEventListener('click', clickCancel, true);
-    } else {
+    window.addEventListener('click', clickCancel, true);
+    return () => {
       window.removeEventListener('click', clickCancel, true);
     }
-  }, [context])
+  }, [])
+
+  useLayoutEffect(() => {
+    const refStyle = ref.current.style
+    const refRect = ref.current.getBoundingClientRect()
+    const { rect, ...other } = context.style
+
+    Object.entries(other).forEach(([key, value]) => {
+      refStyle[key] = typeof value === "number" ? `${value}px` : value
+    })
+
+    refStyle.right = `${window.innerWidth - rect.right + rect.width}px`
+    if (rect.top + refRect.height > window.innerHeight) {
+      refStyle.bottom = `${window.innerHeight - rect.top - rect.height}px`
+    } else {
+      refStyle.top = `${rect.top}px`
+    }
+  }, [])
 
   return createPortal((
     <div
@@ -986,7 +1006,7 @@ const BasicDialog = (props) => {
       className={classNames(css.basicDialog, {
         [css.basicDialogShow]: context
       })}
-      style={context?.style}
+      // style={context?.style}
     >
       {/* {children} */}
       {React.Children.map(children, (child) =>
